@@ -1,6 +1,6 @@
 { inputs, outputs, stateVersion, ... }:
 {
-  mkDarwin = { hostname, username ? "alex", system ? "aarch64-darwin",}:
+  mkDarwin = { hostname, username ? "thanhhaikhong", system ? "aarch64-darwin",}:
   let
     inherit (inputs.nixpkgs) lib;
     unstablePkgs = inputs.nixpkgs-unstable.legacyPackages.${system};
@@ -38,7 +38,7 @@
             enableRosetta = true;
             autoMigrate = true;
             mutableTaps = true;
-            user = "${username}";
+            user = "thanhhaikhong";
             taps = with inputs; {
               "homebrew/homebrew-core" = homebrew-core;
               "homebrew/homebrew-cask" = homebrew-cask;

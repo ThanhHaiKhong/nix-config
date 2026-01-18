@@ -3,7 +3,7 @@ let
   inherit (inputs) nixpkgs nixpkgs-unstable;
 in
 {
-  users.users.alex.home = "/Users/alex";
+  users.users.thanhhaikhong.home = "/Users/thanhhaikhong";
 
   nix = {
     settings = {
@@ -15,7 +15,7 @@ in
   system.stateVersion = 5;
 
   # Set primary user for system-wide activation
-  system.primaryUser = "alex";
+  system.primaryUser = "thanhhaikhong";
 
   nixpkgs = {
     config.allowUnfree = true;
@@ -121,7 +121,7 @@ in
       "font-hack-nerd-font"
       "font-jetbrains-mono-nerd-font"
       "font-meslo-lg-nerd-font"
-      "ghostty"
+      "wezterm"
       "google-chrome"
       "handbrake"
       #"iina"

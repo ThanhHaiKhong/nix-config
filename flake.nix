@@ -17,11 +17,6 @@
 
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
-
-    # disko.url = "github:nix-community/disko";
-    # disko.inputs.nixpkgs.follows = "nixpkgs";
-
-    # vscode-server.url = "github:nix-community/nixos-vscode-server";
   };
 
   outputs = { ... }@inputs:
@@ -36,13 +31,10 @@
 
       darwinConfigurations = {
         # personal
-        nauvis = libx.mkDarwin { hostname = "nauvis"; };
-        mac-studio = libx.mkDarwin { hostname = "mac-studio"; };
-        mba15 = libx.mkDarwin { hostname = "mba15"; };
+        macbook-pro = libx.mkDarwin { hostname = "macbook-pro"; };
 
         # work
-        baldrick = libx.mkDarwin { hostname = "baldrick"; };
-        magrathea = libx.mkDarwin { hostname = "magrathea"; };
+        mac-mini = libx.mkDarwin { hostname = "mac-mini"; };
       };
 
       colmena = {
@@ -63,8 +55,7 @@
         morphnix = import ./hosts/nixos/morphnix;
         nvllama = import ./hosts/nixos/nvllama;
 
-        # test system
-        # yeager = nixosSystem "x86_64-linux" "yeager" "alex";
+
       };
 
     };
