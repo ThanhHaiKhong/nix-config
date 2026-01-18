@@ -99,8 +99,7 @@ in
       "visual-studio-code"
       "wezterm"
 
-      # Development & Terminal
-      "xcode"
+
 
       # Fonts
       "font-fira-code-nerd-font"
@@ -115,6 +114,7 @@ in
     masApps = {
       "rCmd" = 1596283165;
       "Tailscale" = 1475387142;
+      "Xcode" = 497799835;
     };
   };
 
