@@ -3,7 +3,7 @@ let
   inherit (inputs) nixpkgs nixpkgs-unstable;
 in
 {
-  users.users.thanhhaikhong.home = "/Users/thanhhaikhong";
+  users.users.${username}.home = "/Users/${username}";
 
   nix = {
     settings = {
@@ -15,34 +15,37 @@ in
   system.stateVersion = 5;
 
   # Set primary user for system-wide activation
-  system.primaryUser = "thanhhaikhong";
+  system.primaryUser = username;
 
   nixpkgs = {
     config.allowUnfree = true;
     hostPlatform = lib.mkDefault "${system}";
   };
 
-  environment.systemPackages = with pkgs; [
-    ## unstable
-    unstablePkgs.yt-dlp
-    unstablePkgs.get_iplayer
-    unstablePkgs.colmena
-    unstablePkgs.talhelper
+   # Essential CLI tools installed via Nix
+   environment.systemPackages = with pkgs; [
+     # Development & DevOps Tools
+     age
+     comma
+     hcloud
+     just
+     lima
+     nodejs
+     opentofu
+     pass
+     sops
+     turso-cli
+     yq
 
-    ## stable CLI
-    pkgs.age
-    pkgs.comma
-    pkgs.hcloud
-    pkgs.just
-    pkgs.lima
-    pkgs.nix
-    pkgs.nodejs
-    pkgs.opentofu
-    pkgs.pass
-    pkgs.sops
-    pkgs.turso-cli
-    pkgs.yq
-  ];
+     # Media & Utilities
+     unstablePkgs.yt-dlp
+     unstablePkgs.get_iplayer
+
+     # Nix Ecosystem
+     nix
+     unstablePkgs.colmena
+     unstablePkgs.talhelper
+   ];
 
   fonts.packages = [
     pkgs.nerd-fonts.fira-code
@@ -71,7 +74,8 @@ in
     promptInit = builtins.readFile ./../../data/mac-dot-zshrc;
   };
 
-  homebrew = {
+   # GUI Applications installed via Homebrew
+   homebrew = {
     enable = true;
     onActivation = {
       cleanup = "zap";
@@ -91,79 +95,51 @@ in
       #"FelixKratz/formulae" #sketchybar
     ];
     casks = [
-      #"screenflow"
-      #"cleanshot"
-      "adobe-creative-cloud"
-      #"alcove"
-      "audacity"
-      "autodesk-fusion"
-      #"balenaetcher"
-      "bambu-studio"
-      "bentobox"
-      "claude"
-      #"claude-code"
-      #"clop"
+      # Browsers & Communication
       "chatgpt-atlas" # Atlas browser
       "discord"
-      "displaylink"
-      #"docker"
-      "easy-move-plus-resize"
-      "element"
-      "elgato-camera-hub"
-      "elgato-control-center"
-      "elgato-stream-deck"
       "firefox"
-      "flameshot"
-      "font-fira-code"
+      "google-chrome"
+      "signal"
+
+      # Development & Terminal
+      "iterm2"
+      "visual-studio-code"
+      "wezterm"
+
+      # Productivity & Writing
+      "notion"
+      "obsidian"
+      "raycast"
+
+      # Media & Creative
+      "audacity"
+      "handbrake"
+      "obs"
+      "vlc"
+
+      # System & Utilities
+      "appcleaner"
+      "istat-menus"
+      "jordanbaird-ice"
+      "karabiner-elements"
+      "nextcloud"
+      "omnidisksweeper"
+      "orbstack"
+
+      # Gaming & Entertainment
+      "steam"
+      "spotify"
+
+      # Fonts
       "font-fira-code-nerd-font"
-      "font-fira-mono-for-powerline"
       "font-hack-nerd-font"
       "font-jetbrains-mono-nerd-font"
       "font-meslo-lg-nerd-font"
-      "wezterm"
-      "google-chrome"
-      "handbrake"
-      #"iina"
-      "hammerspoon"
-      "istat-menus"
-      "iterm2"
-      "jordanbaird-ice"
-      "karabiner-elements"
-      "lm-studio"
-      "logitech-options"
-      "macwhisper"
-      #"marta"
-      "mqtt-explorer"
-      "music-decoy" # github/FuzzyIdeas/MusicDecoy
-      "nextcloud"
-      "notion"
-      "obs"
-      "obsidian"
-      #"ollama-app"
-      "omnidisksweeper"
-      "orbstack"
-      "openscad"
-      "openttd"
-      "plexamp"
-      #"popclip"
-      #"prusaslicer"
-      "raycast"
-      "signal"
-      #"shortcat"
-      "slack"
-      "spotify"
-      "steam"
-      #"wireshark"
-      #"viscosity"
-      "visual-studio-code"
-      "vlc"
-      # "lm-studio"
 
-      # # rogue amoeba
-      "audio-hijack"
-      "farrago"
-      "loopback"
-      "soundsource"
+      # Hardware & Peripherals
+      "displaylink"
+      "logitech-options"
     ];
     masApps = {
       "Amphetamine" = 937984704;
