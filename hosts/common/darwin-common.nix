@@ -37,10 +37,6 @@ in
      turso-cli
      yq
 
-     # Media & Utilities
-     unstablePkgs.yt-dlp
-     unstablePkgs.get_iplayer
-
      # Nix Ecosystem
      nix
      unstablePkgs.colmena
@@ -85,11 +81,10 @@ in
     global.autoUpdate = true;
 
     brews = [
-      #"bitwarden-cli"
+      "bitwarden-cli"
       "neovim"
-      "ollama"
-      #"tailscale"
-      #"borders"
+      "tailscale"
+      "borders"
     ];
     taps = [
       #"FelixKratz/formulae" #sketchybar
@@ -98,32 +93,14 @@ in
       # Browsers & Communication
       "chatgpt-atlas" # Atlas browser
       "discord"
-      "firefox"
-      "google-chrome"
       "signal"
 
       # Development & Terminal
-      "iterm2"
       "visual-studio-code"
       "wezterm"
 
-      # Productivity & Writing
-      "notion"
-      "obsidian"
-      "raycast"
-
-
-
-      # System & Utilities
-      "appcleaner"
-      "istat-menus"
-      "jordanbaird-ice"
-      "karabiner-elements"
-      "nextcloud"
-      "omnidisksweeper"
-      "orbstack"
-
-
+      # Development & Terminal
+      "xcode"
 
       # Fonts
       "font-fira-code-nerd-font"
@@ -136,35 +113,8 @@ in
       "logitech-options"
     ];
     masApps = {
-      "Amphetamine" = 937984704;
-      "AutoMounter" = 1160435653;
-      "Bitwarden" = 1352778147;
-      "Creator's Best Friend" = 1524172135;
-      "Fantastical" = 975937182;
-      "Ivory for Mastodon by Tapbots" = 6444602274;
-      "Home Assistant Companion" = 1099568401;
-      #"Microsoft Remote Desktop" = 1295203466;
-      "Perplexity" = 6714467650;
-      "Resize Master" = 1025306797;
       "rCmd" = 1596283165;
-      "Snippety" = 1530751461;
-      #"Tailscale" = 1475387142;
-      "Telegram" = 747648890;
-      "The Unarchiver" = 425424353;
-      "Todoist" = 585829637;
-      "UTM" = 1538878817;
-      "Wireguard" = 1451685025;
-
-
-
-      # these apps only available via uk apple id
-      #"Logic Pro" = 634148309;
-      #"MainStage" = 634159523;
-      #"Garageband" = 682658836;
-      #"ShutterCount" = 720123827;
-      #"Teleprompter" = 1533078079;
-
-
+      "Tailscale" = 1475387142;
     };
   };
 
