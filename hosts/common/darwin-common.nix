@@ -112,11 +112,7 @@ in
       "obsidian"
       "raycast"
 
-      # Media & Creative
-      "audacity"
-      "handbrake"
-      "obs"
-      "vlc"
+
 
       # System & Utilities
       "appcleaner"
@@ -127,9 +123,7 @@ in
       "omnidisksweeper"
       "orbstack"
 
-      # Gaming & Entertainment
-      "steam"
-      "spotify"
+
 
       # Fonts
       "font-fira-code-nerd-font"
@@ -146,8 +140,6 @@ in
       "AutoMounter" = 1160435653;
       "Bitwarden" = 1352778147;
       "Creator's Best Friend" = 1524172135;
-      "DaVinci Resolve" = 571213070;
-      "Disk Speed Test" = 425264550;
       "Fantastical" = 975937182;
       "Ivory for Mastodon by Tapbots" = 6444602274;
       "Home Assistant Companion" = 1099568401;
@@ -163,7 +155,7 @@ in
       "UTM" = 1538878817;
       "Wireguard" = 1451685025;
 
-      "Final Cut Pro" = 424389933;
+
 
       # these apps only available via uk apple id
       #"Logic Pro" = 634148309;
@@ -172,9 +164,7 @@ in
       #"ShutterCount" = 720123827;
       #"Teleprompter" = 1533078079;
 
-      "Keynote" = 409183694;
-      "Numbers" = 409203825;
-      "Pages" = 409201541;
+
     };
   };
 
