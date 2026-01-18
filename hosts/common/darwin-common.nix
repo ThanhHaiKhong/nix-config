@@ -94,7 +94,6 @@ in
       #"screenflow"
       #"cleanshot"
       "adobe-creative-cloud"
-      #"nikitabobko/tap/aerospace"
       #"alcove"
       "audacity"
       "autodesk-fusion"
