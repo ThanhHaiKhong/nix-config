@@ -224,12 +224,6 @@ in
       "com.apple.ImageCapture".disableHotPlug = true;
       # Turn on app auto-update
       "com.apple.commerce".AutoUpdate = true;
-      "com.googlecode.iterm2".PromptOnQuit = false;
-      "com.google.Chrome" = {
-        AppleEnableSwipeNavigateWithScrolls = true;
-        DisablePrintPreview = true;
-        PMPrintingExpandedStateForPrint2 = true;
-      };
   };
 
 }
