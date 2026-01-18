@@ -1,123 +1,893 @@
+# ============================================================================
+# ✨ Enhanced Starship Configuration for WezTerm
+# ============================================================================
+# https://starship.rs/config/
+
+# Get editor completions based on the config schema
 "$schema" = 'https://starship.rs/config-schema.json'
 
+# Use custom format for better control
+# Advanced format with custom modules and contextual information
 format = """
 $os\
-$username$hostname\
-[](bg:blue_mid fg:arch_blue)\
+$username\
+$hostname\
 $directory\
-[](fg:blue_mid bg:blue_dark)\
 $git_branch\
 $git_status\
-[](fg:blue_dark bg:midnight_mid)\
+$git_metrics\
+$git_state\
+$custom.nvim_session\
+$custom.tmux\
+$fill\
 $nodejs\
+$bun\
+$python\
 $rust\
 $golang\
+$dart\
+$java\
+$swift\
+$kotlin\
 $php\
-[](fg:midnight_mid bg:midnight)\
-$time\
-[ ](fg:midnight)\
-\n$character"""
+$ruby\
+$lua\
+$c\
+$cmake\
+$deno\
+$crystal\
+$elixir\
+$elm\
+$erlang\
+$fennel\
+$gleam\
+$haskell\
+$julia\
+$nim\
+$ocaml\
+$perl\
+$scala\
+$zig\
+$docker_context\
+$kubernetes\
+$aws\
+$gcloud\
+$azure\
+$container\
+$cmd_duration\
+$jobs\
+$status\
+$line_break\
+$character"""
 
-palette = 'arch_gradient'
+# Add a blank line between shell prompts
+add_newline = true
 
-[palettes.arch_gradient]
-arch_blue = '#1793d1'
-blue_mid = '#0074ae'
-blue_dark = '#394260'
-midnight_mid = '#212736'
-midnight = '#1d2230'
-text_dark = '#090c0c'
-text_light = '#e3e5e5'
-text_accent = '#769ff0'
-text_muted = '#a0a9cb'
-separator = '#a3aed2'
+# Performance optimizations
+scan_timeout = 50
+command_timeout = 1000
 
-[os]
-format = "[ $symbol ]($style)"
-style = "bg:arch_blue fg:text_light"
-disabled = false
+# Color palette
+palette = "catppuccin_mocha"
 
-[os.symbols]
-Windows = "󰍲"
-Ubuntu = "󰕈"
-SUSE = ""
-Raspbian = "󰐿"
-Mint = "󰣭"
-Macos = "󰀵"
-Manjaro = ""
-Linux = "󰌽"
-Gentoo = "󰣨"
-Fedora = "󰣛"
-Alpine = ""
-Amazon = ""
-Android = ""
-Arch = "󰣇"
-EndeavourOS = ""
-CentOS = ""
-Debian = "󰣚"
-Redhat = "󱄛"
-RedHatEnterprise = "󱄛"
+# ============================================================================
+# COLOR PALETTES
+# ============================================================================
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
+pink = "#f5c2e7"
+mauve = "#cba6f7"
+red = "#f38ba8"
+maroon = "#eba0ac"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+blue = "#89b4fa"
+lavender = "#b4befe"
+text = "#cdd6f4"
+subtext1 = "#bac2de"
+subtext0 = "#a6adc8"
+overlay2 = "#9399b2"
+overlay1 = "#7f849c"
+overlay0 = "#6c7086"
+surface2 = "#585b70"
+surface1 = "#45475a"
+surface0 = "#313244"
+base = "#1e1e2e"
+mantle = "#181825"
+crust = "#11111b"
 
-[username]
-show_always = true
-style_user = "bg:arch_blue fg:text_light"
-style_root = "bg:arch_blue fg:text_light"
-format = '[$user]($style)'
+# ============================================================================
+# RIGHT PROMPT CONFIGURATION
+# ============================================================================
+# Advanced right prompt with contextual information
+# Shows: username (SSH), kubernetes context, time, battery, memory
+right_format = """$username$kubernetes$time$battery$memory_usage"""
 
-[hostname]
-ssh_only = false
-format = "[@$hostname ]($style)"
-style = "bg:arch_blue fg:text_light"
-disabled = false
+# ============================================================================
+# CONTINUATION PROMPT
+# ============================================================================
+continuation_prompt = '▶▶ '
 
+# ============================================================================
+# PROMPT SYMBOL CONFIGURATION
+# ============================================================================
+[character]
+# Advanced style strings with multiple formatting options
+success_symbol = '[❯](bold green)'
+error_symbol = '[❯](bold red)'
+vicmd_symbol = '[❮](bold yellow)'
+vimcmd_replace_one_symbol = '[❮](bold purple)'
+vimcmd_replace_symbol = '[❮](bold purple)'
+vimcmd_visual_symbol = '[❮](bold orange)'
+
+# ============================================================================
+# DIRECTORY DISPLAY
+# ============================================================================
 [directory]
-style = "fg:text_light bg:blue_mid"
-format = "[ $path ]($style)"
-truncation_length = 2
+# Advanced styling: bold + color from palette
+style = "bold blue"
+read_only = " 󰌾"
+read_only_style = "bold red"
+truncation_length = 5
 truncate_to_repo = false
-truncation_symbol = "…/"
+home_symbol = "󰋜 ~"
+# Format with advanced styling features
+format = "[$path]($style)[$read_only]($read_only_style) "
+repo_root_style = "bold blue underline"
+repo_root_format = "[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style) "
 
-[directory.substitutions]
-"Documents" = "󰈙 "
-"Downloads" = " "
-"Music" = " "
-"Pictures" = " "
+# [directory.substitutions]
+# "Documents" = "󰈙 "
+# "Downloads" = " "
+# "Music" = "󱍞 "
+# "Pictures" = " "
+# "Videos" = " "
+# "Projects" = "󰴋 "
+# "dotfiles" = " "
 
+# ============================================================================
+# GIT CONFIGURATION
+# ============================================================================
 [git_branch]
-symbol = ""
-style = "bg:blue_dark"
-format = '[[ $symbol $branch ](fg:text_accent bg:blue_dark)]($style)'
+symbol = " "
+style = "bold green"
+format = "on [$symbol$branch(:$remote_branch)]($style) "
+truncation_length = 20
+truncation_symbol = "…"
 
 [git_status]
-style = "bg:blue_dark"
-format = '[[($all_status$ahead_behind )](fg:text_accent bg:blue_dark)]($style)'
+style = "bold red"
+ahead = "⇡${count} "
+diverged = "⇕⇡${ahead_count}⇣${behind_count} "
+behind = "⇣${count} "
+up_to_date = "󰘽 "
+untracked = "?${count} "
+staged = "+${count} "
+modified = "!${count} "
+renamed = "»${count} "
+deleted = "✗${count} "
+conflicted = "=${count} "
+stashed = "\\$${count} "
+format = "([$all_status$ahead_behind]($style))"
 
+# Show detailed git metrics
+[git_metrics]
+added_style = "bold green"
+deleted_style = "bold red"
+only_nonzero_diffs = true
+format = '([+$added]($added_style) )([-$deleted]($deleted_style) )'
+disabled = false
+
+# Git state (rebase, merge, etc.)
+[git_state]
+rebase = "REBASING"
+merge = "MERGING"
+revert = "REVERTING"
+cherry_pick = "CHERRY-PICKING"
+bisect = "BISECTING"
+am = "AM"
+am_or_rebase = "AM/REBASE"
+style = "bold yellow"
+format = '\\([$state( $progress_current/$progress_total)]($style)\\) '
+
+# ============================================================================
+# SYSTEM INFORMATION
+# ============================================================================
+[os]
+disabled = false
+style = "bold white"
+format = "[$symbol]($style)"
+
+[os.symbols]
+Macos = " "
+Ubuntu = " "
+Windows = "󰖳 "
+
+[username]
+style_user = "bold yellow"
+style_root = "bold red"
+format = "[$user]($style) "
+disabled = false
+show_always = false
+
+[hostname]
+ssh_only = true
+style = "bold green"
+format = "[@$hostname]($style) "
+disabled = false
+
+# ============================================================================
+# PERFORMANCE METRICS
+# ============================================================================
+[cmd_duration]
+min_time = 1000
+show_milliseconds = true
+format = "󱎫 [$duration](bold yellow) "
+show_notifications = false
+
+[jobs]
+symbol = " "
+style = "bold red"
+number_threshold = 1
+symbol_threshold = 1
+format = "[$symbol$number]($style) "
+
+# Right-side fill for alignment
+[fill]
+symbol = " "
+style = "bold black"
+
+# ============================================================================
+# DEVELOPMENT LANGUAGES
+# ============================================================================
 [nodejs]
-symbol = ""
-style = "bg:midnight_mid"
-format = '[[ $symbol ($version) ](fg:text_accent bg:midnight_mid)]($style)'
+symbol = " "
+style = "bold green"
+format = "[$symbol($version )]($style)"
+detect_extensions = ["js", "mjs", "cjs", "ts", "tsx"]
+detect_files = ["package.json", ".nvmrc"]
+
+[python]
+symbol = " "
+style = "bold yellow"
+format = '[${symbol}${pyenv_prefix}(${version} )\\($virtualenv\\) ]($style)'
+detect_extensions = ["py"]
+detect_files = ["requirements.txt", "pyproject.toml", "Pipfile"]
 
 [rust]
-symbol = ""
-style = "bg:midnight_mid"
-format = '[[ $symbol ($version) ](fg:text_accent bg:midnight_mid)]($style)'
+symbol = " "
+style = "bold red"
+format = "[$symbol($version )]($style)"
+detect_extensions = ["rs"]
+detect_files = ["Cargo.toml"]
 
 [golang]
-symbol = ""
-style = "bg:midnight_mid"
-format = '[[ $symbol ($version) ](fg:text_accent bg:midnight_mid)]($style)'
+symbol = " "
+style = "bold cyan"
+format = "[$symbol($version )]($style)"
+detect_extensions = ["go"]
+detect_files = ["go.mod", "go.sum"]
+
+[dart]
+symbol = " "
+style = "bold blue"
+format = "[$symbol($version )]($style)"
+detect_extensions = ["dart"]
+detect_files = ["pubspec.yaml", "pubspec.lock"]
+
+[java]
+symbol = " "
+style = "bold orange"
+format = "[$symbol($version )]($style)"
+detect_extensions = ["java", "class", "jar"]
+detect_files = ["pom.xml", "build.gradle", "build.gradle.kts"]
+
+# Additional languages
+[swift]
+symbol = " "
+style = "bold orange"
+format = "[$symbol($version )]($style)"
+
+[kotlin]
+symbol = " "
+style = "bold purple"
+format = "[$symbol($version )]($style)"
 
 [php]
-symbol = ""
-style = "bg:midnight_mid"
-format = '[[ $symbol ($version) ](fg:text_accent bg:midnight_mid)]($style)'
+symbol = " "
+style = "bold purple"
+format = "[$symbol($version )]($style)"
 
+[ruby]
+symbol = " "
+style = "bold red"
+format = "[$symbol($version )]($style)"
+
+# ============================================================================
+# LUA (Essential for Neovim configuration)
+# ============================================================================
+[lua]
+symbol = " "
+style = "bold blue"
+format = "[$symbol($version )]($style)"
+detect_extensions = ["lua"]
+detect_files = [".lua-version"]
+
+# ============================================================================
+# C/C++ (Essential for LSPs and Neovim plugins)
+# ============================================================================
+[c]
+symbol = " "
+style = "bold blue"
+format = "[$symbol($version(-$name) )]($style)"
+detect_extensions = ["c", "h"]
+commands = [["cc", "--version"], ["gcc", "--version"], ["clang", "--version"]]
+
+[cmake]
+symbol = "△ "
+style = "bold blue"
+format = "[$symbol($version )]($style)"
+detect_files = ["CMakeLists.txt", "CMakeCache.txt"]
+
+# ============================================================================
+# MODERN RUNTIMES
+# ============================================================================
+[deno]
+symbol = "🦕 "
+style = "bold green"
+format = "[$symbol($version )]($style)"
+detect_files = ["deno.json", "deno.jsonc", "deno.lock", "mod.ts", "mod.js", "deps.ts", "deps.js"]
+
+[bun]
+symbol = "🥟 "
+style = "bold yellow"
+format = "[$symbol($version )]($style)"
+detect_files = ["bun.lock", "bun.lockb", "bunfig.toml"]
+
+# ============================================================================
+# FUNCTIONAL & SYSTEMS LANGUAGES
+# ============================================================================
+[crystal]
+symbol = "🔮 "
+style = "bold red"
+format = "[$symbol($version )]($style)"
+detect_extensions = ["cr"]
+detect_files = ["shard.yml"]
+
+[elixir]
+symbol = " "
+style = "bold purple"
+format = '[$symbol($version \(OTP $otp_version\) )]($style)'
+detect_extensions = ["ex", "exs"]
+detect_files = ["mix.exs"]
+
+[elm]
+symbol = " "
+style = "bold cyan"
+format = "[$symbol($version )]($style)"
+detect_extensions = ["elm"]
+detect_files = ["elm.json", "elm-package.json", ".elm-version"]
+
+[erlang]
+symbol = " "
+style = "bold red"
+format = "[$symbol($version )]($style)"
+detect_files = ["rebar.config", "erlang.mk"]
+
+[fennel]
+symbol = "🧅 "
+style = "bold green"
+format = "[$symbol($version )]($style)"
+detect_extensions = ["fnl"]
+
+[gleam]
+symbol = "⭐ "
+style = "bold yellow"
+format = "[$symbol($version )]($style)"
+detect_extensions = ["gleam"]
+detect_files = ["gleam.toml"]
+
+[haskell]
+symbol = " "
+style = "bold purple"
+format = "[$symbol($version )]($style)"
+detect_extensions = ["hs", "lhs"]
+detect_files = ["stack.yaml", "cabal.project"]
+
+[julia]
+symbol = " "
+style = "bold purple"
+format = "[$symbol($version )]($style)"
+detect_extensions = ["jl"]
+detect_files = ["Project.toml", "Manifest.toml"]
+
+[nim]
+symbol = "👑 "
+style = "bold yellow"
+format = "[$symbol($version )]($style)"
+detect_extensions = ["nim", "nims", "nimble"]
+
+[ocaml]
+symbol = "🐪 "
+style = "bold orange"
+format = '[$symbol($version )(\($switch_indicator$switch_name\) )]($style)'
+detect_extensions = ["opam", "ml", "mli", "re", "rei"]
+detect_files = ["dune", "dune-project", "jbuild", "jbuild-ignore", ".merlin"]
+
+[perl]
+symbol = "🐪 "
+style = "bold blue"
+format = "[$symbol($version )]($style)"
+detect_extensions = ["pl", "pm", "pod"]
+detect_files = ["Makefile.PL", "Build.PL", "cpanfile", "cpanfile.snapshot"]
+
+[scala]
+symbol = " "
+style = "bold red"
+format = "[$symbol($version )]($style)"
+detect_extensions = ["sbt", "scala"]
+detect_files = [".scalaenv", ".sbtenv", "build.sbt"]
+
+[zig]
+symbol = " "
+style = "bold yellow"
+format = "[$symbol($version )]($style)"
+detect_extensions = ["zig"]
+
+# ============================================================================
+# CLOUD & CONTAINERS
+# ============================================================================
+[docker_context]
+symbol = " "
+style = "bold blue"
+format = "[$symbol$context ]($style)"
+only_with_files = true
+detect_files = ["docker-compose.yml", "docker-compose.yaml", "Dockerfile"]
+
+[kubernetes]
+symbol = "☸ "
+style = "bold blue"
+format = '[$symbol$context( \\($namespace\\))]($style) '
+disabled = true  # Enable when needed
+detect_files = ["k8s", "kustomization.yaml"]
+
+[aws]
+symbol = "  "
+style = "bold yellow"
+format = "[$symbol($profile )(\\($region\\) )([$duration] )]($style)"
+expiration_symbol = "󰃰"
+
+[gcloud]
+symbol = "󱇶 "
+style = "bold blue"
+format = "[$symbol$account(@$domain)(\\($region\\))]($style) "
+
+[azure]
+symbol = "󰠅 "
+style = "bold blue"
+format = "[$symbol($subscription)]($style) "
+disabled = false
+
+# ============================================================================
+# PACKAGE MANAGERS
+# ============================================================================
+[package]
+symbol = "󰏗 "
+style = "bold magenta"
+format = "[$symbol$version]($style) "
+disabled = false
+
+# Development environment indicators
+[conda]
+symbol = "🅒 "
+style = "bold green"
+format = "[$symbol$environment]($style) "
+ignore_base = true
+
+[meson]
+symbol = "⬢ "
+style = "bold blue"
+format = "[$symbol$project]($style) "
+disabled = false
+
+[spack]
+symbol = "🅢 "
+style = "bold blue"
+format = "[$symbol$environment]($style) "
+disabled = false
+
+# [npm]  # Not a standard Starship module
+# symbol = " "
+# style = "bold red"
+# format = "[$symbol($version )]($style)"
+# detect_files = ["package.json"]
+
+# ============================================================================
+# BATTERY (for laptops)
+# ============================================================================
+[battery]
+full_symbol = "󰁹 "
+charging_symbol = "󰂄 "
+discharging_symbol = "󰂃 "
+unknown_symbol = "󰁽 "
+empty_symbol = "󰂎 "
+format = "[$symbol$percentage]($style) "
+
+[[battery.display]]
+threshold = 15
+style = "bold red"
+discharging_symbol = "󰂎 "
+
+[[battery.display]]
+threshold = 30
+style = "bold yellow"
+discharging_symbol = "󰁺 "
+
+[[battery.display]]
+threshold = 60
+style = "bold green"
+
+[[battery.display]]
+threshold = 100
+style = "bold green"
+
+# ============================================================================
+# MEMORY USAGE
+# ============================================================================
+[memory_usage]
+symbol = "󰍛"
+style = "bold peach"
+format = "[$symbol${ram}]($style)"
+threshold = 75
+disabled = false
+
+# ============================================================================
+# TIME DISPLAY
+# ============================================================================
 [time]
 disabled = false
-time_format = "%R"
-style = "bg:midnight"
-format = '[[ $time ](fg:text_muted bg:midnight)]($style)'
+time_format = "%H:%M"
+format = "[$time]($style)"
+style = "bold lavender"
+utc_time_offset = "local"
 
-[character]
-success_symbol = '[>](arch_blue)'
-error_symbol = '[>](arch_blue)'
+# ============================================================================
+# STATUS & ERROR HANDLING
+# ============================================================================
+[status]
+style = "bold red"
+symbol = "✖"
+success_symbol = ""
+format = "[$symbol $common_meaning$signal_name$maybe_int]($style) "
+map_symbol = true
+disabled = false
+
+# ============================================================================
+# SHELL INDICATORS
+# ============================================================================
+[shell]
+fish_indicator = " "
+powershell_indicator = "󰨊 "
+unknown_indicator = "mystery shell"
+style = "cyan bold"
+disabled = true
+
+# ============================================================================
+# CONTAINER AND RUNTIME DETECTION
+# ============================================================================
+[container]
+symbol = "⬢ "
+style = "bold red dimmed"
+format = "[$symbol$name]($style) "
+
+[buf]
+symbol = "🐃 "
+style = "bold blue"
+format = "[$symbol($version )]($style)"
+detect_files = ["buf.yaml", "buf.gen.yaml", "buf.work.yaml"]
+
+[terraform]
+symbol = "󱁢 "
+style = "bold purple"
+format = "[$symbol$workspace]($style) "
+
+[nix_shell]
+symbol = " "
+style = "bold blue"
+format = "[$symbol$state( \\($name\\))]($style) "
+
+# ============================================================================
+# ADVANCED FEATURES CONFIGURATION
+# ============================================================================
+
+# ──────────────────────────────────────────────────────────────────────────
+# TRANSIENT PROMPT (Clean Command History)
+# ──────────────────────────────────────────────────────────────────────────
+# Transient prompt replaces previous prompts with minimal versions
+# Benefits: Cleaner scrollback, reduced visual clutter, faster terminal
+#
+# For Bash (~/.bashrc):
+# PROMPT_COMMAND='PS1="$(starship prompt --status=$? --jobs=${STARSHIP_JOBS_COUNT:-0} --terminal-width=${COLUMNS:-0})"'
+# function blastoff(){
+#     PS1="❯ "
+#     PS2="❯ "
+# }
+# trap blastoff DEBUG
+#
+# For Zsh (~/.zshrc):
+# setopt PROMPT_SUBST
+# PROMPT='$(starship prompt --status=$?)'
+# function zle-line-init() {
+#     PROMPT="❯ "
+# }
+# zle -N zle-line-init
+#
+# For Fish (~/.config/fish/config.fish):
+# function starship_transient_prompt_func
+#   starship module character
+# end
+# enable_transience
+#
+# For PowerShell (add to profile):
+# Invoke-Expression (&starship init powershell)
+# Enable-TransientPrompt
+
+# ──────────────────────────────────────────────────────────────────────────
+# PRE-PROMPT & PRE-EXECUTION COMMANDS
+# ──────────────────────────────────────────────────────────────────────────
+# Run custom functions before rendering prompt or executing commands
+#
+# For Bash (~/.bashrc):
+# starship_precmd_user_func="my_custom_precmd"
+# function my_custom_precmd() {
+#     # Example: Print timestamp before each prompt
+#     # echo "Last command completed at $(date)"
+# }
+#
+# For Fish (~/.config/fish/config.fish):
+# function starship_preprompt_user_func
+#     # Example: Check for system updates
+#     # set -l updates (checkupdates 2>/dev/null | wc -l)
+#     # test $updates -gt 0 && echo "Updates available: $updates"
+# end
+#
+# function starship_preexec_user_func
+#     # Example: Log commands to file
+#     # echo "$(date): $argv" >> ~/.command_history.log
+# end
+
+# ============================================================================
+# WINDOW TITLE CONFIGURATION
+# ============================================================================
+# Dynamic window titles show useful context in your terminal tab/window
+#
+# For Bash/Zsh (~/.bashrc or ~/.zshrc):
+# function set_win_title(){
+#     echo -ne "\033]0;$(whoami)@$(hostname):$(basename "$PWD")\007"
+# }
+# starship_precmd_user_func="set_win_title"
+#
+# For Fish (~/.config/fish/config.fish):
+# function starship_preprompt_user_func
+#     set -l dir_name (basename $PWD)
+#     set -l git_branch (git branch --show-current 2>/dev/null)
+#     if test -n "$git_branch"
+#         echo -ne "\033]0;$dir_name ($git_branch)\007"
+#     else
+#         echo -ne "\033]0;$dir_name\007"
+#     end
+# end
+#
+# For PowerShell (add to profile):
+# function Invoke-Starship-PreCommand {
+#   $host.ui.RawUI.WindowTitle = "$pwd"
+# }
+
+# ============================================================================
+# CUSTOM COMMANDS - Advanced Contextual Information
+# ============================================================================
+# These custom commands provide contextual awareness for development workflows
+
+# Git conventional commit scope detection
+[custom.git_scope]
+command = "git config --get conventional.scope || echo ''"
+when = "git rev-parse --is-inside-work-tree 2> /dev/null"
+style = "bold purple"
+format = "[scope:($output)]($style) "
+disabled = true
+
+# Show current git user when in a git repo (useful for multi-account setups)
+[custom.git_user]
+command = "git config --get user.name"
+when = "git rev-parse --is-inside-work-tree 2> /dev/null"
+style = "bold blue"
+format = "[($output)]($style) "
+disabled = true
+
+# Neovim configuration detection
+[custom.nvim_config]
+command = "echo ''"
+when = "test -d ~/.config/nvim || test -f ~/.vimrc"
+symbol = " "
+style = "bold green"
+format = "[$symbol]($style)"
+disabled = true
+
+# Show if in a Neovim session (when NVIM environment variable is set)
+[custom.nvim_session]
+command = "echo 'NVIM'"
+when = "test -n \"$NVIM\""
+symbol = " "
+style = "bold magenta"
+format = "[$symbol$output]($style) "
+disabled = false
+
+# LSP servers detection (Mason-installed)
+[custom.lsp_servers]
+command = "ls ~/.local/share/nvim/mason/bin/ 2>/dev/null | wc -l | tr -d ' '"
+when = "test -d ~/.local/share/nvim/mason/bin && test $(ls ~/.local/share/nvim/mason/bin/ 2>/dev/null | wc -l) -gt 0"
+symbol = "󱃖 "
+style = "bold cyan"
+format = "[$symbol$output]($style) "
+disabled = true
+
+# Show if running in tmux session
+[custom.tmux]
+command = "echo 'tmux'"
+when = "test -n \"$TMUX\""
+symbol = " "
+style = "bold green"
+format = "[$symbol]($style) "
+disabled = false
+
+# Show current directory's git commit count (useful for tracking progress)
+[custom.git_commits]
+command = "git rev-list --count HEAD 2>/dev/null || echo '0'"
+when = "git rev-parse --is-inside-work-tree 2> /dev/null"
+symbol = "󰜘 "
+style = "bold yellow"
+format = "[$symbol$output]($style) "
+disabled = true
+
+# Show last command execution time with milliseconds precision
+[custom.last_cmd]
+command = "echo ''"
+when = "false"
+symbol = "󱦟 "
+style = "bold cyan"
+format = "[$symbol$output]($style) "
+disabled = true
+
+# Show active SSH agent status
+[custom.ssh_agent]
+command = "test -n \"$SSH_AUTH_SOCK\" && echo 'active' || echo ''"
+when = "test -n \"$SSH_AUTH_SOCK\""
+symbol = "󰣀 "
+style = "bold green"
+format = "[$symbol]($style) "
+disabled = true
+
+# ============================================================================
+# IMPLEMENTATION GUIDE - Advanced Features
+# ============================================================================
+# This configuration includes several advanced Starship features.
+# To enable them, add the appropriate code to your shell configuration file.
+#
+# CURRENT SHELL DETECTION:
+# Run: echo $SHELL
+#
+# ──────────────────────────────────────────────────────────────────────────
+# QUICK START - Copy relevant section to your shell config
+# ──────────────────────────────────────────────────────────────────────────
+#
+# FOR ZSH (~/.zshrc):
+# ──────────────────────────────────────────────────────────────────────────
+# # Initialize Starship
+# eval "$(starship init zsh)"
+#
+# # Window Title - Shows directory and git branch
+# function set_win_title(){
+#     local dir_name=$(basename "$PWD")
+#     local git_branch=$(git branch --show-current 2>/dev/null)
+#     if [[ -n "$git_branch" ]]; then
+#         echo -ne "\033]0;$dir_name ($git_branch)\007"
+#     else
+#         echo -ne "\033]0;$dir_name\007"
+#     fi
+# }
+# starship_precmd_user_func="set_win_title"
+#
+# # Optional: Custom precmd for notifications or logging
+# function my_precmd() {
+#     # Example: Check for long-running command completion
+#     # if [[ $CMD_DURATION -gt 10000 ]]; then
+#     #     notify-send "Command completed" "Took ${CMD_DURATION}ms"
+#     # fi
+# }
+# # starship_precmd_user_func="my_precmd"
+#
+# ──────────────────────────────────────────────────────────────────────────
+# FOR BASH (~/.bashrc):
+# ──────────────────────────────────────────────────────────────────────────
+# # Initialize Starship
+# eval "$(starship init bash)"
+#
+# # Window Title - Shows directory and git branch
+# function set_win_title(){
+#     local dir_name=$(basename "$PWD")
+#     local git_branch=$(git branch --show-current 2>/dev/null)
+#     if [[ -n "$git_branch" ]]; then
+#         echo -ne "\033]0;$dir_name ($git_branch)\007"
+#     else
+#         echo -ne "\033]0;$dir_name\007"
+#     fi
+# }
+# starship_precmd_user_func="set_win_title"
+#
+# ──────────────────────────────────────────────────────────────────────────
+# FOR FISH (~/.config/fish/config.fish):
+# ──────────────────────────────────────────────────────────────────────────
+# # Initialize Starship
+# starship init fish | source
+#
+# # Window Title with git branch
+# function starship_preprompt_user_func
+#     set -l dir_name (basename $PWD)
+#     set -l git_branch (git branch --show-current 2>/dev/null)
+#     if test -n "$git_branch"
+#         echo -ne "\033]0;$dir_name ($git_branch)\007"
+#     else
+#         echo -ne "\033]0;$dir_name\007"
+#     end
+# end
+#
+# # Optional: Enable transient prompt for cleaner history
+# # function starship_transient_prompt_func
+# #   starship module character
+# # end
+# # enable_transience
+#
+# ──────────────────────────────────────────────────────────────────────────
+# FEATURE TOGGLES
+# ──────────────────────────────────────────────────────────────────────────
+# Enable/disable features by changing 'disabled = true/false' for:
+# - [custom.tmux]           - Show tmux indicator
+# - [custom.nvim_session]   - Show Neovim session indicator
+# - [custom.git_user]       - Show git username
+# - [custom.lsp_servers]    - Show LSP server count
+# - [custom.ssh_agent]      - Show SSH agent status
+# - [kubernetes]            - Show k8s context (heavy performance cost)
+# - [status]                - Show command exit status
+#
+# ──────────────────────────────────────────────────────────────────────────
+# PERFORMANCE TIPS
+# ──────────────────────────────────────────────────────────────────────────
+# 1. Keep scan_timeout low (currently 50ms)
+# 2. Disable unused language modules
+# 3. Disable kubernetes module if not using k8s
+# 4. Use 'only_with_files = true' for context-based modules
+# 5. Increase command_timeout if in slow environments
+#
+# ──────────────────────────────────────────────────────────────────────────
+# STYLE STRING REFERENCE
+# ──────────────────────────────────────────────────────────────────────────
+# Text styles: bold, italic, underline, dimmed, strikethrough
+# Colors: black, red, green, yellow, blue, purple, cyan, white
+# Bright colors: bright-<color>
+# Hex colors: #RRGGBB (e.g., #89b4fa)
+# ANSI colors: 0-255 (e.g., 208)
+# Palette colors: Use color names from [palettes.catppuccin_mocha]
+#
+# Examples:
+# - "bold red"                 -> Bold red text
+# - "underline blue"           -> Blue underlined text
+# - "bold italic #89b4fa"      -> Bold italic with hex color
+# - "bold lavender"            -> Bold using palette color
+# - "bg:blue fg:white"         -> White text on blue background
+#
+# ============================================================================

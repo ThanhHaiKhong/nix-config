@@ -1,0 +1,24 @@
+[pull]
+	rebase = true
+[user]
+	name = ThanhHaiKhong
+	email = khongthanhhai@gmail.com
+[core]
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+	light = false
+	side-by-side = true
+	line-numbers = true
+	syntax-theme = Dracula
+[merge]
+	conflictstyle = diff3
+[diff]
+	colorMoved = default
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

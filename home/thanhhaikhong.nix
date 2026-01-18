@@ -87,7 +87,7 @@
     enable = true;
     enableCompletion = true;
     autosuggestion.enable = true;
-    #initExtra = (builtins.readFile ../mac-dot-zshrc);
+    initExtra = (builtins.readFile ./.zshrc);
   };
 
   programs.tmux = {
@@ -177,7 +177,12 @@
   programs.home-manager.enable = true;
   programs.nix-index.enable = true;
 
-  programs.alacritty.enable = true;
+   programs.alacritty.enable = true;
+
+   programs.wezterm = {
+     enable = true;
+     extraConfig = builtins.readFile ./wezterm/wezterm.lua;
+   };
 
   programs.bat.enable = true;
   programs.bat.config.theme = "Nord";
