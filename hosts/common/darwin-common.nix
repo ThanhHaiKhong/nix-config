@@ -109,7 +109,8 @@ in
       "wezterm"
       "warp"
 
-
+      # Utilities & Tools
+      "aldente"
 
       # Fonts
       "font-fira-code-nerd-font"
