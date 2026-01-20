@@ -20,12 +20,8 @@ in
   # Set primary user for system-wide activation
   system.primaryUser = username;
   
-  # Add nix-darwin to staff group to fix HOME ownership warnings
-  users.groups.nix-darwin = {};
-  users.users.nix-darwin = {
-    isSystemUser = true;
-    group = "nix-darwin";
-  };
+  # Fix HOME ownership by adding current user to staff group
+  users.groups.staff.members = [ username ];
 
   nixpkgs = {
     config.allowUnfree = true;
