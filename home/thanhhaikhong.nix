@@ -82,7 +82,7 @@
     enable = true;
     enableCompletion = true;
     autosuggestion.enable = true;
-    initExtraFirst = builtins.readFile ./.zshrc;
+    initContent = builtins.readFile ./.zshrc;
   };
 
   programs.tmux = {
@@ -225,6 +225,7 @@
 
   programs.ssh = {
     enable = true;
+    enableDefaultConfig = false;
     extraConfig = ''
       StrictHostKeyChecking ask
     '';

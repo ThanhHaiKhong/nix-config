@@ -14,12 +14,6 @@ in
       builders-use-substitutes = true;
     };
     channel.enable = false;
-    
-    # Configure binary caches using environment variables
-    environment.variables = {
-      NIX_SUBSTITUTERS = "https://cache.nixos.org https://nix-community.cachix.org";
-      NIX_TRUSTED_PUBLIC_KEYS = "cache.nixos.org-1:6NCHdD59N4C0ZCzw9idT9idqAPWiBT5KOSy8rE+j1+zE= nix-community.cachix.org-1:mB9FSh9qf2dCImDSIXpXVyl4A7d4XjfHebCja5=";
-    };
   };
   system.stateVersion = 5;
 
@@ -74,6 +68,7 @@ in
     # Fix builtins.toFile context warning
     nix.extraOptions = [
       "--no-warn-dirty"
+      "--quiet"
     ];
 
   
