@@ -20,8 +20,11 @@ in
   # Set primary user for system-wide activation
   system.primaryUser = username;
   
-  # Fix HOME ownership by adding current user to staff group
+  # Fix HOME ownership - add user to staff group  
   users.groups.staff.members = [ username ];
+  
+  # Fix HOME environment for nix-darwin
+  environment.variables.HOME = "/Users/thanhhaikhong";
 
   nixpkgs = {
     config.allowUnfree = true;
