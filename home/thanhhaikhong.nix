@@ -82,7 +82,9 @@
     enable = true;
     enableCompletion = true;
     autosuggestion.enable = true;
-    initContent = builtins.readFile ./.zshrc;
+    initExtra = ''
+      source ~/.zshrc 2>/dev/null || true
+    '';
   };
 
   programs.tmux = {
