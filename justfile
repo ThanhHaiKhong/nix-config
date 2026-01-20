@@ -53,7 +53,7 @@ install IP:
     if [ -d \"nix-config\" ]; then \
         rm -rf nix-config; \
     fi && \
-    git clone https://github.com/ironicbadger/nix-config.git && \
+    git clone https://github.com/ThanhHaiKhong/nix-config.git && \
     cd nix-config/lib/install && \
     sh install-nix.sh\"'"
 

@@ -37,26 +37,11 @@
         mac-mini = libx.mkDarwin { hostname = "mac-mini"; };
       };
 
-      colmena = {
-        meta = {
-          nixpkgs = import inputs.nixpkgs { system = "x86_64-linux"; };
-          specialArgs = {
-            inherit inputs outputs stateVersion self;
-          };
-        };
-
-        defaults = { lib, config, name, ... }: {
-          imports = [
-            inputs.home-manager.nixosModules.home-manager
-          ];
-        };
-
-        # wd
-        morphnix = import ./hosts/nixos/morphnix;
-        nvllama = import ./hosts/nixos/nvllama;
-
-
-      };
+      # NixOS configurations (currently disabled)
+      # nixosConfigurations = {
+      #   morphnix = import ./hosts/nixos/morphnix;
+      #   nvllama = import ./hosts/nixos/nvllama;
+      # };
 
     };
 

@@ -82,7 +82,7 @@
     enable = true;
     enableCompletion = true;
     autosuggestion.enable = true;
-    initExtra = (builtins.readFile ./.zshrc);
+    initExtraFirst = builtins.readFile ./.zshrc;
   };
 
   programs.tmux = {
@@ -225,19 +225,10 @@
 
   programs.ssh = {
     enable = true;
-    enableDefaultConfig = false;
     extraConfig = ''
-      StrictHostKeyChecking no
+      StrictHostKeyChecking ask
     '';
     matchBlocks = {
-      # ~/.ssh/config
-      "*" = {
-        user = "root";
-        extraOptions = {
-          UserKnownHostsFile = "/dev/null";
-          LogLevel = "ERROR";
-        };
-      };
       "github.com" = {
         hostname = "ssh.github.com";
         port = 443;

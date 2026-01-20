@@ -6,11 +6,20 @@ in
   users.users.${username}.home = "/Users/${username}";
 
   nix = {
+    enable = false;
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
       warn-dirty = false;
+      auto-optimise-store = true;
+      builders-use-substitutes = true;
     };
     channel.enable = false;
+    
+    # Configure binary caches using environment variables
+    environment.variables = {
+      NIX_SUBSTITUTERS = "https://cache.nixos.org https://nix-community.cachix.org";
+      NIX_TRUSTED_PUBLIC_KEYS = "cache.nixos.org-1:6NCHdD59N4C0ZCzw9idT9idqAPWiBT5KOSy8rE+j1+zE= nix-community.cachix.org-1:mB9FSh9qf2dCImDSIXpXVyl4A7d4XjfHebCja5=";
+    };
   };
   system.stateVersion = 5;
 
@@ -24,30 +33,28 @@ in
 
    # Essential CLI tools installed via Nix
    environment.systemPackages = with pkgs; [
-     # Development & DevOps Tools
-     age
-     comma
-     hcloud
-     just
-     lima
-     nodejs
-     opentofu
-     pass
-     sops
-     turso-cli
-     yq
+      # Development & DevOps Tools
+      age
+      comma
+      hcloud
+      just
+      lima
+      nodejs
+      opentofu
+      pass
+      sops
+      turso-cli
+      yq
 
-     # Nix Ecosystem
-     nix
-     unstablePkgs.colmena
-     unstablePkgs.talhelper
-   ];
+      # Nix Ecosystem  
+      nix
+    ];
 
-  fonts.packages = [
-    pkgs.nerd-fonts.fira-code
-    pkgs.nerd-fonts.fira-mono
-    pkgs.nerd-fonts.hack
-    pkgs.nerd-fonts.jetbrains-mono
+  fonts.packages = with pkgs; [
+    nerd-fonts.fira-code
+    nerd-fonts.fira-mono
+    nerd-fonts.hack
+    nerd-fonts.jetbrains-mono
   ];
 
   # pins to stable as unstable updates very often
@@ -63,12 +70,13 @@ in
   };
 
   programs.nix-index.enable = true;
+    
+    # Fix builtins.toFile context warning
+    nix.extraOptions = [
+      "--no-warn-dirty"
+    ];
 
-  programs.zsh = {
-    enable = true;
-    enableCompletion = true;
-    promptInit = builtins.readFile ./../../data/mac-dot-zshrc;
-  };
+  
 
    # GUI Applications installed via Homebrew
    homebrew = {
@@ -83,8 +91,7 @@ in
     brews = [
       "bitwarden-cli"
       "neovim"
-      "tailscale"
-      "borders"
+      "gh"
     ];
     taps = [
       #"FelixKratz/formulae" #sketchybar
@@ -93,11 +100,11 @@ in
       # Browsers & Communication
       "chatgpt-atlas" # Atlas browser
       "discord"
-      "signal"
 
       # Development & Terminal
       "visual-studio-code"
       "wezterm"
+      "warp"
 
 
 
@@ -109,11 +116,9 @@ in
 
       # Hardware & Peripherals
       "displaylink"
-      "logitech-options"
+      "logi-options-plus"
     ];
     masApps = {
-      "rCmd" = 1596283165;
-      "Tailscale" = 1475387142;
       "Xcode" = 497799835;
     };
   };
@@ -140,6 +145,7 @@ in
     LaunchServices.LSQuarantine = false; # disables "Are you sure?" for new apps
     loginwindow.GuestEnabled = false;
     finder.FXPreferredViewStyle = "Nlsv";
+    
   };
 
   system.defaults.CustomUserPreferences = {
