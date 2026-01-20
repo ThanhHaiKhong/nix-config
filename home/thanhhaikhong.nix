@@ -229,6 +229,11 @@
     enable = true;
     enableDefaultConfig = false;
     matchBlocks = {
+      "*" = {
+        extraOptions = {
+          StrictHostKeyChecking ask;
+        };
+      };
       "github.com" = {
         hostname = "ssh.github.com";
         port = 443;
