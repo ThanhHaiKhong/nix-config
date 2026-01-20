@@ -225,15 +225,15 @@
 
   programs.ssh = {
     enable = true;
-    enableDefaultConfig = false;
-    extraConfig = ''
-      StrictHostKeyChecking ask
-    '';
     matchBlocks = {
       "github.com" = {
         hostname = "ssh.github.com";
         port = 443;
       };
     };
+    extraConfig = ''
+      Host *
+        StrictHostKeyChecking ask
+    '';
   };
 }
