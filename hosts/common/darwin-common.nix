@@ -23,6 +23,11 @@ in
   # Fix HOME ownership - add user to staff group  
   users.groups.staff.members = [ username ];
   
+  # Set proper HOME for nix-darwin
+  environment.sessionVariables = {
+    HOME = "/Users/thanhhaikhong";
+  };
+  
   # Fix HOME environment for nix-darwin
   environment.variables.HOME = "/Users/thanhhaikhong";
 
