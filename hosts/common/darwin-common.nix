@@ -12,6 +12,8 @@ in
       warn-dirty = false;
       auto-optimise-store = true;
       builders-use-substitutes = true;
+      accept-flake-config = true;
+      sandbox = false;
     };
     channel.enable = false;
   };
