@@ -111,6 +111,7 @@ in
 
       # Utilities & Tools
       "aldente"
+      "opencode"
 
       # Fonts
       "font-fira-code-nerd-font"
