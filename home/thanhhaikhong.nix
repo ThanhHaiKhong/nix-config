@@ -183,6 +183,10 @@
      zsh-autosuggestions
    ];
 
+   # Enable zsh modules through Home Manager
+   programs.zsh.syntaxHighlighting.enable = true;
+   programs.zsh.autosuggestion.enable = true;
+
    programs.ssh = {
      enable = true;
      enableDefaultConfig = false;
