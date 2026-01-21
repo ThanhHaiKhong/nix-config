@@ -110,18 +110,10 @@
     };
 
     # Zsh configuration files
-    home.file.".zshenv" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/tmp/nix-config/home/zsh/.zshenv";
-    };
-    home.file.".zprofile" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/tmp/nix-config/home/zsh/.zprofile";
-    };
-    home.file.".zshrc" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/tmp/nix-config/home/zsh/.zshrc";
-    };
-    home.file.".zlogin" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/tmp/nix-config/home/zsh/.zlogin";
-    };
+    home.file.".zshenv".source = ./zsh/.zshenv;
+    home.file.".zprofile".source = ./zsh/.zprofile;
+    home.file.".zshrc".source = ./zsh/.zshrc;
+    home.file.".zlogin".source = ./zsh/.zlogin;
 
   programs.tmux = {
     enable = true;
