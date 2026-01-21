@@ -51,6 +51,3 @@ eval "$(pyenv init -)"
 # Final aliases (after all other configurations)
 # ============================================================================
 function lg() { lazygit "$@"; }
-
-# Added by Antigravity
-export PATH="/Users/thanhhaikhong/.antigravity/antigravity/bin:$PATH"
