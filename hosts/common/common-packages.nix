@@ -63,5 +63,8 @@ in
 
     # Tailscale VPN
     tailscale
+
+    # AI & Development Tools
+    opencode
   ];
 }
