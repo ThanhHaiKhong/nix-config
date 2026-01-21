@@ -54,7 +54,7 @@ bindkey '^R' history-incremental-search-backward
 function lg() { lazygit "$@"; }
 
 # Shell aliases
-alias cat="${pkgs.bat}/bin/bat"
+alias cat="/etc/profiles/per-user/thanhhaikhong/bin/bat"
 alias ls="eza"
 alias ll="eza -l"
 alias la="eza -la"
@@ -62,7 +62,4 @@ alias tree="eza --tree"
 alias cd="z"
 alias vi="nvim"
 alias vim="nvim"
-alias diff="diff-so-fancy"echo "ZSHRC LOADED" >> /tmp/zsh_debug.log
-echo "ZSHRC LOADED AT $(date)" >> /tmp/zsh_debug.log
-echo "End of .zshrc reached" >&2
-declare -f lg
+alias diff="diff-so-fancy"
