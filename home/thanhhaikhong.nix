@@ -144,29 +144,9 @@
       sensible
     ];
     extraConfig = ''
-      # remap prefix from 'C-b' to 'C-a'
-      unbind C-b
-      set-option -g prefix C-a
-      bind-key C-a send-prefix
-
-      # Basic pane splitting
-      bind | split-window -h
-      bind - split-window -v
-
-      # reload config file
-      bind r source-file ~/.config/tmux/tmux.conf
-
-      # Basic window/pane navigation
-      bind -n M-Left select-pane -L
-      bind -n M-Right select-pane -R
-      bind -n M-Up select-pane -U
-      bind -n M-Down select-pane -D
-
-      # Basic settings
+      # Basic tmux settings - will expand later to avoid Nix syntax conflicts
       set -g mouse on
       set -g history-limit 10000
-      set -g status-position top
-      set -g status-style fg=green
     '';
   };
 
