@@ -161,27 +161,27 @@
   programs.bat.config.theme = "Nord";
   #programs.zsh.shellAliases.cat = "${pkgs.bat}/bin/bat";
 
-  programs.neovim = {
-    enable = true;
-    viAlias = true;
-    vimAlias = true;
-    vimdiffAlias = true;
-
-    # Minimal plugins - lazy.nvim handles the rest via lua/plugins.lua
-    plugins = with pkgs.vimPlugins; [
-      # Plugin manager
-      lazy-nvim
-
-      # Core dependencies that lazy needs
-      plenary-nvim
-    ];
-
-    # Point to our reorganized config structure
-    extraConfig = ''
-      -- Load main configuration entry point
-      vim.cmd('luafile ./init.lua')
-    '';
-  };
+  # programs.neovim = {
+  #   enable = true;
+  #   viAlias = true;
+  #   vimAlias = true;
+  #   vimdiffAlias = true;
+  #
+  #   # Minimal plugins - lazy.nvim handles the rest via lua/plugins.lua
+  #   plugins = with pkgs.vimPlugins; [
+  #     # Plugin manager
+  #     lazy-nvim
+  #
+  #     # Core dependencies that lazy needs
+  #     plenary-nvim
+  #   ];
+  #
+  #   # Point to our reorganized config structure
+  #   extraConfig = ''
+  #     -- Load main configuration entry point
+  #     vim.cmd('luafile ./init.lua')
+  #   '';
+  # };
 
   programs.zoxide.enable = true;
 
