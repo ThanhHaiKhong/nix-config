@@ -199,7 +199,7 @@
 
     # Opencode configuration
     home.file.".local/opencode" = {
-      source = ./opencode;
+      source = builtins.path { path = ./opencode; name = "opencode-config"; };
       recursive = true;
     };
 }
