@@ -60,5 +60,8 @@ in
 
     # requires nixpkgs.config.allowUnfree = true;
     vscode-extensions.ms-vscode-remote.remote-ssh
+
+    # Tailscale VPN
+    tailscale
   ];
 }

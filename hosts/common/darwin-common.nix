@@ -49,9 +49,12 @@ in
       turso-cli
       yq
 
-      # Nix Ecosystem  
-      nix
-    ];
+       # Nix Ecosystem
+       nix
+
+       # Networking & VPN
+       tailscale
+     ];
 
   fonts.packages = with pkgs; [
     nerd-fonts.fira-code
