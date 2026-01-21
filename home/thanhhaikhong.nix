@@ -81,7 +81,7 @@
 
     programs.zsh = {
       enable = true;
-      dotDir = "zsh";
+      dotDir = "${config.home.homeDirectory}/zsh";
       enableCompletion = true;
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
