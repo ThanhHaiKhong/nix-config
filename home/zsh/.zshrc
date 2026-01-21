@@ -34,6 +34,18 @@ eval "$(pyenv init -)"
 # ============================================================================
 
 # ============================================================================
+# Oh My Zsh setup (manual configuration since dotDir is not set)
+# ============================================================================
+export ZSH="/nix/store/jrlg1f9j1rx82wp3gs5cly218fn83y6h-oh-my-zsh-2025-11-23/share/oh-my-zsh"
+export ZSH_THEME="robbyrussell"
+export plugins=(git docker kubectl)
+
+# Source oh-my-zsh
+if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
+    source "$ZSH/oh-my-zsh.sh"
+fi
+
+# ============================================================================
 # VSCode Shell Integration
 # Ref: https://code.visualstudio.com/docs/terminal/shell-integration
 # ============================================================================
@@ -45,8 +57,10 @@ fi
 # ============================================================================
 # Pyenv initialization (for interactive shells)
 # ============================================================================
-eval "$(pyenv init --path)"
-eval "$(pyenv init -)"
+if command -v pyenv &> /dev/null; then
+    eval "$(pyenv init --path)"
+    eval "$(pyenv init -)"
+fi
 
 # ============================================================================
 # Starship prompt (must be AFTER oh-my-zsh to override its theme)
@@ -54,5 +68,6 @@ eval "$(pyenv init -)"
 eval "$(starship init zsh)"
 
 # ============================================================================
-# Additional customizations (oh-my-zsh and functions handled by Home Manager)
+# Custom functions and aliases
 # ============================================================================
+function lg() { lazygit "$@"; }
