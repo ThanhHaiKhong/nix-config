@@ -1,50 +1,29 @@
 # ============================================================================
-# VSCode Shell Integration - Using Automatic Injection
+# .zshrc - Interactive shell configuration
+# Loaded for every interactive zsh session
+# ============================================================================
+
+# ============================================================================
+# VSCode Shell Integration
 # Ref: https://code.visualstudio.com/docs/terminal/shell-integration
-# terminal.integrated.shellIntegration.enabled = true (in settings)
 # ============================================================================
-
-# ============================================================================
-# Essential PATH setup (for VSCode to find commands immediately)
-# ============================================================================
-# User local binaries (custom scripts and tools)
-export PATH="$HOME/.local/bin:$PATH"
-
-# Opencode
-export PATH="$HOME/.opencode/bin:$PATH"
-
-# Homebrew
-export PATH="/opt/homebrew/bin:$PATH"
-export HOMEBREW_AUTO_UPDATE_SECS=86400  # Auto-update every 24 hours
-
-# Java
-export JAVA_HOME="/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home"
-export PATH="$JAVA_HOME/bin:$PATH"
-
-# Swift
-export PATH="/opt/homebrew/opt/swift/bin:$PATH"
-
-# Essential environment variables
-export CLICOLOR=1
-export LSCOLORS=ExFxBxDxCxegedabagacad
+if [[ "$TERM_PROGRAM" == "vscode" ]]; then
+    # VSCode terminal integration is handled automatically
+    # No manual sourcing needed
+fi
 
 # ============================================================================
-# VSCode Shell Integration: Load everything immediately for proper hook setup
+# Pyenv initialization (for interactive shells)
 # ============================================================================
-# Removed zshrc_heavy sourcing
-
-# Starship prompt (must be AFTER oh-my-zsh to override its theme)
-eval "$(starship init zsh)"
-
-# ============================================================================
-# Pyenv setup (MUST be last to take precedence over all other Python installs)
-# ============================================================================
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init --path)"
 eval "$(pyenv init -)"
 
 # ============================================================================
-# Final aliases (after all other configurations)
+# Starship prompt (must be AFTER oh-my-zsh to override its theme)
+# ============================================================================
+eval "$(starship init zsh)"
+
+# ============================================================================
+# Custom functions and aliases
 # ============================================================================
 function lg() { lazygit "$@"; }
