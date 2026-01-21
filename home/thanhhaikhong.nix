@@ -74,57 +74,55 @@
     enable = true;
     enableZshIntegration = true;
     enableBashIntegration = true;
-    settings = pkgs.lib.importTOML ./starship/starship.toml;
+    settings = builtins.fromTOML (builtins.readFile ./starship/starship.toml);
   };
 
   programs.bash.enable = true;
 
-    programs.zsh = {
-      enable = true;
-      enableCompletion = true;
+  programs.zsh = {
+    enable = true;
+    enableCompletion = true;
 
-      # Enhanced completion settings
-      completionInit = ''
-        # Load and initialize completion system
-        autoload -Uz compinit && compinit
+    # Enhanced completion settings
+    completionInit = ''
+      # Load and initialize completion system
+      autoload -Uz compinit && compinit
 
-        # Basic completion styling
-        zstyle ':completion:*' menu select
-        zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
-      '';
-      initExtra = ''
-        # Enable vi mode
-        bindkey -v
+      # Basic completion styling
+      zstyle ':completion:*' menu select
+      zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+    '';
+    initExtra = ''
+      # Enable vi mode
+      bindkey -v
 
-        # Better history search
-        bindkey "^R" history-incremental-search-backward
+      # Better history search
+      bindkey "^R" history-incremental-search-backward
 
-        # Enhanced history settings
-        setopt hist_ignore_all_dups
-        setopt hist_ignore_space
-        setopt hist_reduce_blanks
-        setopt hist_verify
-        setopt share_history
-        setopt extended_history
-        setopt inc_append_history
+      # Enhanced history settings
+      setopt hist_ignore_all_dups
+      setopt hist_ignore_space
+      setopt hist_reduce_blanks
+      setopt hist_verify
+      setopt share_history
+      setopt extended_history
+      setopt inc_append_history
 
-        # Additional zsh options for better completion behavior
-        setopt complete_in_word
-        setopt always_to_end
-        setopt auto_menu
-        setopt auto_param_slash
-        setopt extended_glob
-        setopt mark_dirs
-      '';
-    };
+      # Additional zsh options for better completion behavior
+      setopt complete_in_word
+      setopt always_to_end
+      setopt auto_menu
+      setopt auto_param_slash
+      setopt extended_glob
+      setopt mark_dirs
+    '';
+  };
 
-    # Zsh configuration files
-    home.file.".zshenv".source = ./zsh/.zshenv;
-    home.file.".zprofile".source = ./zsh/.zprofile;
-    home.file.".zshrc".source = ./zsh/.zshrc;
-    home.file.".zlogin".source = ./zsh/.zlogin;
-
-
+  # Zsh configuration files
+  home.file.".zshenv".source = ./zsh/.zshenv;
+  home.file.".zprofile".source = ./zsh/.zprofile;
+  home.file.".zshrc".source = ./zsh/.zshrc;
+  home.file.".zlogin".source = ./zsh/.zlogin;
 
   programs.home-manager.enable = true;
   programs.nix-index.enable = true;
@@ -159,17 +157,17 @@
   #   '';
   # };
 
-   programs.zoxide.enable = true;
+  programs.zoxide.enable = true;
 
-   # Install zsh modules explicitly
-   home.packages = with pkgs; [
-     zsh-syntax-highlighting
-     zsh-autosuggestions
-   ];
+  # Install zsh modules explicitly
+  home.packages = with pkgs; [
+    zsh-syntax-highlighting
+    zsh-autosuggestions
+  ];
 
-   # Enable zsh modules through Home Manager
-   programs.zsh.syntaxHighlighting.enable = true;
-   programs.zsh.autosuggestion.enable = true;
+  # Enable zsh modules through Home Manager
+  programs.zsh.syntaxHighlighting.enable = true;
+  programs.zsh.autosuggestion.enable = true;
 
    programs.ssh = {
      enable = true;
