@@ -12,17 +12,17 @@
 # ============================================================================
 # Zsh Syntax Highlighting
 # ============================================================================
-# Load zsh-syntax-highlighting if available
-if [[ -f "/etc/profiles/per-user/thanhhaikhong/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
-    source "/etc/profiles/per-user/thanhhaikhong/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+# Load zsh-syntax-highlighting if available in standard locations
+if [[ -f "$HOME/.nix-profile/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+    source "$HOME/.nix-profile/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 fi
 
 # ============================================================================
 # Zsh Autosuggestions
 # ============================================================================
-# Load zsh-autosuggestions if available
-if [[ -f "/etc/profiles/per-user/thanhhaikhong/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
-    source "/etc/profiles/per-user/thanhhaikhong/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+# Load zsh-autosuggestions if available in standard locations
+if [[ -f "$HOME/.nix-profile/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+    source "$HOME/.nix-profile/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
 fi
 
 # ============================================================================
@@ -47,7 +47,7 @@ fi
 eval "$(starship init zsh)"
 
 # Shell aliases
-alias cat="/etc/profiles/per-user/thanhhaikhong/bin/bat"
+alias cat="bat"
 alias ls="eza"
 alias ll="eza -l"
 alias la="eza -la"
