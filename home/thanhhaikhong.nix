@@ -225,17 +225,29 @@
 
   programs.zoxide.enable = true;
 
-  programs.ssh = {
-    enable = true;
-    matchBlocks = {
-      "github.com" = {
-        hostname = "ssh.github.com";
-        port = 443;
-      };
-    };
-    extraConfig = ''
-      Host *
-        StrictHostKeyChecking ask
-    '';
-  };
+   programs.ssh = {
+     enable = true;
+     enableDefaultConfig = false;
+     matchBlocks = {
+       "*" = {
+         forwardAgent = false;
+         addKeysToAgent = "no";
+         compression = false;
+         serverAliveInterval = 0;
+         serverAliveCountMax = 3;
+         hashKnownHosts = false;
+         userKnownHostsFile = "~/.ssh/known_hosts";
+         controlMaster = "no";
+         controlPath = "~/.ssh/master-%r@%n:%p";
+         controlPersist = "no";
+         extraOptions = {
+           StrictHostKeyChecking = "ask";
+         };
+       };
+       "github.com" = {
+         hostname = "ssh.github.com";
+         port = 443;
+       };
+     };
+   };
 }

@@ -27,8 +27,9 @@ in
   
   
   
-  # Fix HOME environment for nix-darwin
-  environment.variables.HOME = "/Users/thanhhaikhong";
+   # Fix HOME environment for nix-darwin
+   environment.variables.HOME = "/Users/thanhhaikhong";
+   # GitHub CLI auto-auth: add GITHUB_TOKEN to ~/.config/sops/age/keys.txt and secrets/secrets.yaml
 
   nixpkgs = {
     config.allowUnfree = true;
@@ -75,13 +76,17 @@ in
 
   programs.nix-index.enable = true;
     
-    # Fix builtins.toFile context warning
-    nix.extraOptions = [
-      "--no-warn-dirty"
-      "--quiet"
-    ];
+     # Fix builtins.toFile context warning
+     nix.extraOptions = [
+       "--no-warn-dirty"
+       "--quiet"
+     ];
 
-  
+   # SOPS for secrets
+   sops.defaultSopsFile = ../secrets/secrets.yaml;
+   sops.age.keyFile = "/Users/${username}/.config/sops/age/keys.txt";
+
+   
 
    # GUI Applications installed via Homebrew
    homebrew = {
@@ -104,7 +109,7 @@ in
     casks = [
       # Browsers & Communication
       "chatgpt-atlas" # Atlas browser
-      "discord"
+      "telegram-desktop"
 
       # Development & Terminal
       "visual-studio-code"

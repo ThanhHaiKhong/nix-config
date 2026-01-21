@@ -14,6 +14,7 @@
         ../hosts/common/common-packages.nix
         ../hosts/common/darwin-common.nix
         customConf
+        inputs.sops-nix.darwinModules.sops
         # Add nodejs overlay to fix build issues (https://github.com/NixOS/nixpkgs/issues/402079)
         {
           nixpkgs.overlays = [
