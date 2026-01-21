@@ -46,9 +46,6 @@ fi
 # ============================================================================
 lg() { lazygit "$@"; }
 
-# Make ~ alone go to home directory
-~() { cd ~; }
-
 # Shell aliases
 alias cat="bat"
 alias ls="eza"
