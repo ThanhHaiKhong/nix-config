@@ -18,15 +18,15 @@ fi
 # ============================================================================
 # Zsh Syntax Highlighting
 # ============================================================================
-# Load zsh-syntax-highlighting if available
-if [[ -f "/run/current-system/sw/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
-    source "/run/current-system/sw/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+# Load zsh-syntax-highlighting from Nix store
+if [[ -f "/nix/store/2q2pffrdhd49kgzr40vh217dpbccpxmi-zsh-syntax-highlighting-0.8.0/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+    source "/nix/store/2q2pffrdhd49kgzr40vh217dpbccpxmi-zsh-syntax-highlighting-0.8.0/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 fi
 
 # ============================================================================
 # Zsh Autosuggestions
 # ============================================================================
-# Load zsh-autosuggestions if available
+# Load zsh-autosuggestions from user profile
 if [[ -f "/etc/profiles/per-user/thanhhaikhong/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
     source "/etc/profiles/per-user/thanhhaikhong/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
 fi
