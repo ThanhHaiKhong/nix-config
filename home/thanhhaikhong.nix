@@ -81,26 +81,9 @@
 
     programs.zsh = {
       enable = true;
-      dotDir = "${config.home.homeDirectory}/.config/zsh";
       enableCompletion = true;
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
-      oh-my-zsh = {
-        enable = true;
-        plugins = [ "git" "docker" "kubectl" ];
-        theme = "robbyrussell";
-      };
-      shellAliases = {
-        cat = "${pkgs.bat}/bin/bat";
-        ls = "eza";
-        ll = "eza -l";
-        la = "eza -la";
-        tree = "eza --tree";
-        cd = "z";
-        vi = "nvim";
-        vim = "nvim";
-        diff = "diff-so-fancy";
-      };
       initExtra = ''
         # Enable vi mode
         bindkey -v
@@ -110,6 +93,17 @@
 
         # Custom functions
         function lg() { lazygit "$@"; }
+
+        # Shell aliases (Home Manager aliases not working with standard locations)
+        alias cat="${pkgs.bat}/bin/bat"
+        alias ls="eza"
+        alias ll="eza -l"
+        alias la="eza -la"
+        alias tree="eza --tree"
+        alias cd="z"
+        alias vi="nvim"
+        alias vim="nvim"
+        alias diff="diff-so-fancy"
       '';
     };
 

@@ -1,10 +1,19 @@
 # ============================================================================
 # .zshrc - Interactive shell configuration
 # Loaded for every interactive zsh session
-#
-# Note: Oh My Zsh is configured via Home Manager in thanhhaikhong.nix
-# This file contains only interactive shell specific customizations
 # ============================================================================
+
+# ============================================================================
+# Oh My Zsh setup (managed here since Home Manager dotDir conflicts with ~ locations)
+# ============================================================================
+export ZSH="${pkgs.oh-my-zsh}/share/oh-my-zsh"
+export ZSH_THEME="robbyrussell"
+export plugins=(git docker kubectl)
+
+# Source oh-my-zsh
+if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
+    source "$ZSH/oh-my-zsh.sh"
+fi
 
 # ============================================================================
 # VSCode Shell Integration
@@ -24,6 +33,6 @@ if command -v pyenv &> /dev/null; then
 fi
 
 # ============================================================================
-# Starship prompt (configured after oh-my-zsh in Home Manager)
+# Starship prompt (loaded after oh-my-zsh)
 # ============================================================================
 eval "$(starship init zsh)"
