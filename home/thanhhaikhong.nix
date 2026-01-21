@@ -79,14 +79,19 @@
 
   programs.bash.enable = true;
 
-  programs.zsh = {
-    enable = true;
-    enableCompletion = true;
-    autosuggestion.enable = true;
-    initExtra = ''
-      source ~/.zshrc 2>/dev/null || true
-    '';
-  };
+   programs.zsh = {
+     enable = true;
+     enableCompletion = true;
+     autosuggestion.enable = true;
+     oh-my-zsh = {
+       enable = true;
+       plugins = [ "git" "docker" "kubectl" ];
+       theme = "robbyrussell";
+     };
+     initExtra = ''
+       source ~/.zshrc 2>/dev/null || true
+     '';
+   };
 
   programs.tmux = {
     enable = true;
