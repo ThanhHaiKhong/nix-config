@@ -208,43 +208,27 @@
   programs.bat.config.theme = "Nord";
   #programs.zsh.shellAliases.cat = "${pkgs.bat}/bin/bat";
 
-  # programs.neovim = {
-  #   enable = true;
-  #   viAlias = true;
-  #   vimAlias = true;
-  #   vimdiffAlias = true;
-  #   plugins = with pkgs.vimPlugins; [
-  #     ## regular
-  #     comment-nvim
-  #     lualine-nvim
-  #     nvim-web-devicons
-  #     vim-tmux-navigator
+  programs.neovim = {
+    enable = true;
+    viAlias = true;
+    vimAlias = true;
+    vimdiffAlias = true;
 
-  #     ## with config
-  #     # {
-  #     #   plugin = gruvbox-nvim;
-  #     #   config = "colorscheme gruvbox";
-  #     # }
+    # Minimal plugins - lazy.nvim handles the rest via lua/plugins.lua
+    plugins = with pkgs.vimPlugins; [
+      # Plugin manager
+      lazy-nvim
 
-  #     {
-  #       plugin = catppuccin-nvim;
-  #       config = "colorscheme catppuccin";
-  #     }
+      # Core dependencies that lazy needs
+      plenary-nvim
+    ];
 
-  #     ## telescope
-  #     {
-  #       plugin = telescope-nvim;
-  #       type = "lua";
-  #       config = builtins.readFile ./nvim/plugins/telescope.lua;
-  #     }
-  #     telescope-fzf-native-nvim
-
-  #   ];
-  #   extraLuaConfig = ''
-  #     ${builtins.readFile ./nvim/options.lua}
-  #     ${builtins.readFile ./nvim/keymap.lua}
-  #   '';
-  # };
+    # Point to our reorganized config structure
+    extraConfig = ''
+      -- Load main configuration entry point
+      vim.cmd('luafile ${./nvim/init.lua}')
+    '';
+  };
 
   programs.zoxide.enable = true;
 
