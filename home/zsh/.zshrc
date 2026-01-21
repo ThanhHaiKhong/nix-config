@@ -27,8 +27,8 @@ fi
 # Zsh Autosuggestions
 # ============================================================================
 # Load zsh-autosuggestions if available
-if [[ -f "/etc/profiles/per-user/thanhhaikhong/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
-    source "/etc/profiles/per-user/thanhhaikhong/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+if [[ -f "/etc/profiles/per-user/thanhhaikhong/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+    source "/etc/profiles/per-user/thanhhaikhong/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
 fi
 
 # ============================================================================
