@@ -28,13 +28,7 @@ export LSCOLORS=ExFxBxDxCxegedabagacad
 # ============================================================================
 # VSCode Shell Integration: Load everything immediately for proper hook setup
 # ============================================================================
-if [[ "$TERM_PROGRAM" == "vscode" ]]; then
-    # In VSCode: Load everything immediately to ensure proper shell integration
-    source "$HOME/.zshrc_heavy"
-else
-    # Non-VSCode: Can use normal loading
-    source "$HOME/.zshrc_heavy"
-fi
+# Removed zshrc_heavy sourcing
 
 # Starship prompt (must be AFTER oh-my-zsh to override its theme)
 eval "$(starship init zsh)"

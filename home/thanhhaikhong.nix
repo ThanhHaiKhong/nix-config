@@ -79,19 +79,38 @@
 
   programs.bash.enable = true;
 
-   programs.zsh = {
-     enable = true;
-     enableCompletion = true;
-     autosuggestion.enable = true;
-     oh-my-zsh = {
-       enable = true;
-       plugins = [ "git" "docker" "kubectl" ];
-       theme = "robbyrussell";
-     };
-     initExtra = ''
-       source ~/.zshrc 2>/dev/null || true
-     '';
-   };
+    programs.zsh = {
+      enable = true;
+      dotDir = "zsh";
+      enableCompletion = true;
+      autosuggestion.enable = true;
+      syntaxHighlighting.enable = true;
+      oh-my-zsh = {
+        enable = true;
+        plugins = [ "git" "docker" "kubectl" ];
+        theme = "robbyrussell";
+      };
+      shellAliases = {
+        cat = "${pkgs.bat}/bin/bat";
+        ls = "eza";
+        ll = "eza -l";
+        la = "eza -la";
+        tree = "eza --tree";
+        cd = "z";
+        vi = "nvim";
+        vim = "nvim";
+        diff = "diff-so-fancy";
+      };
+      initExtra = ''
+        # Enable vi mode
+        bindkey -v
+
+        # Better history search
+        bindkey '^R' history-incremental-search-backward
+
+        # Custom prompt or other settings can go here
+      '';
+    };
 
   programs.tmux = {
     enable = true;
