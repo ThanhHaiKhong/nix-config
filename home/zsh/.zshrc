@@ -36,3 +36,26 @@ fi
 # Starship prompt (loaded after oh-my-zsh)
 # ============================================================================
 eval "$(starship init zsh)"
+
+# ============================================================================
+# Additional zsh configuration (from Home Manager initExtra)
+# ============================================================================
+# Enable vi mode
+bindkey -v
+
+# Better history search
+bindkey '^R' history-incremental-search-backward
+
+# Custom functions
+function lg() { lazygit "$@"; }
+
+# Shell aliases
+alias cat="/nix/store/2q2pffrdhd49kgzr40vh217dpbccpxmi-bat-0.24.0/bin/bat"
+alias ls="eza"
+alias ll="eza -l"
+alias la="eza -la"
+alias tree="eza --tree"
+alias cd="z"
+alias vi="nvim"
+alias vim="nvim"
+alias diff="diff-so-fancy"
