@@ -112,7 +112,7 @@
         setopt inc_append_history
 
         # Custom functions
-        lg() { lazygit "$@"; }
+        lg() { lazygit "$@" ; }
 
         # Shell aliases
         alias cat="${pkgs.bat}/bin/bat"
