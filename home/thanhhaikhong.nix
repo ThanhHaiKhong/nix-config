@@ -179,7 +179,7 @@
     # Point to our reorganized config structure
     extraConfig = ''
       -- Load main configuration entry point
-      vim.cmd([[luafile ./init.lua]])
+      vim.cmd("luafile ./init.lua")
     '';
   };
 
