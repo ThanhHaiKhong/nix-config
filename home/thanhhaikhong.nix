@@ -150,7 +150,7 @@
       bind-key C-a send-prefix
 
       # split panes using | and -
-      bind | split-window -h
+      bind '|' split-window -h
       bind - split-window -v
       unbind '"'
       unbind %
