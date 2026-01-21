@@ -4,10 +4,29 @@
 # ============================================================================
 
 # ============================================================================
-# Source Home Manager generated zsh config (includes oh-my-zsh, syntax highlighting, autosuggestions)
+# Oh My Zsh setup
 # ============================================================================
-if [[ -f "$HOME/.config/zsh/.zshrc" ]]; then
-    source "$HOME/.config/zsh/.zshrc"
+export ZSH="/nix/store/jrlg1f9j1rx82wp3gs5cly218fn83y6h-oh-my-zsh-2025-11-23/share/oh-my-zsh"
+export ZSH_THEME="robbyrussell"
+export plugins=(git docker kubectl)
+
+# Source oh-my-zsh
+if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
+    source "$ZSH/oh-my-zsh.sh"
+fi
+
+# ============================================================================
+# Zsh Syntax Highlighting
+# ============================================================================
+if [[ -f "/etc/profiles/per-user/thanhhaikhong/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+    source "/etc/profiles/per-user/thanhhaikhong/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+fi
+
+# ============================================================================
+# Zsh Autosuggestions
+# ============================================================================
+if [[ -f "/etc/profiles/per-user/thanhhaikhong/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+    source "/etc/profiles/per-user/thanhhaikhong/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 fi
 
 # ============================================================================

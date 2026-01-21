@@ -81,10 +81,7 @@
 
     programs.zsh = {
       enable = true;
-      dotDir = ".config/zsh";
       enableCompletion = true;
-      autosuggestion.enable = true;
-      syntaxHighlighting.enable = true;
 
       # Enhanced completion settings
       completionInit = ''
@@ -110,11 +107,6 @@
         setopt share_history
         setopt extended_history
         setopt inc_append_history
-
-        # Custom functions - simple approach to avoid Nix parsing issues
-        # Note: lg function defined in .zshrc directly to avoid Nix interpolation issues
-
-        # Shell aliases - defined in .zshrc to avoid Nix interpolation issues
 
         # Additional zsh options for better completion behavior
         setopt complete_in_word
