@@ -100,7 +100,7 @@
         bindkey -v
 
         # Better history search
-        bindkey '^R' history-incremental-search-backward
+        bindkey "^R" history-incremental-search-backward
 
         # Enhanced history settings
         setopt hist_ignore_all_dups
