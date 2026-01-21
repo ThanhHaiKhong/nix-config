@@ -54,7 +54,7 @@ bindkey '^R' history-incremental-search-backward
 function lg() { lazygit "$@"; }
 
 # Shell aliases
-alias cat="/nix/store/2q2pffrdhd49kgzr40vh217dpbccpxmi-bat-0.24.0/bin/bat"
+alias cat="${pkgs.bat}/bin/bat"
 alias ls="eza"
 alias ll="eza -l"
 alias la="eza -la"
