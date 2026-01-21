@@ -124,23 +124,7 @@
     home.file.".zshrc".source = ./zsh/.zshrc;
     home.file.".zlogin".source = ./zsh/.zlogin;
 
-  programs.tmux = {
-    enable = true;
-    keyMode = "vi";
-    clock24 = true;
-    historyLimit = 9999999;
-    mouse = true;
-    plugins = with pkgs.tmuxPlugins; [
-      gruvbox
-      vim-tmux-navigator
-      sensible
-    ];
-    extraConfig = ''
-      # Basic tmux settings - will expand later to avoid Nix syntax conflicts
-      set -g mouse on
-      set -g history-limit 10000
-    '';
-  };
+
 
   programs.home-manager.enable = true;
   programs.nix-index.enable = true;
