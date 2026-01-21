@@ -19,9 +19,7 @@ fi
 # Zsh Syntax Highlighting
 # ============================================================================
 # Load zsh-syntax-highlighting if available
-if [[ -f "/etc/profiles/per-user/thanhhaikhong/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
-    source "/etc/profiles/per-user/thanhhaikhong/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-elif [[ -f "/run/current-system/sw/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+if [[ -f "/run/current-system/sw/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
     source "/run/current-system/sw/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 fi
 
