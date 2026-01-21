@@ -19,20 +19,16 @@ fi
 # Zsh Syntax Highlighting
 # ============================================================================
 # Load zsh-syntax-highlighting if available
-if [[ -f "/etc/profiles/per-user/thanhhaikhong/share/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
-    source "/etc/profiles/per-user/thanhhaikhong/share/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-elif [[ -f "/run/current-system/sw/share/zsh/site-functions/zsh-syntax-highlighting.zsh" ]]; then
-    source "/run/current-system/sw/share/zsh/site-functions/zsh-syntax-highlighting.zsh"
+if [[ -f "/etc/profiles/per-user/thanhhaikhong/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+    source "/etc/profiles/per-user/thanhhaikhong/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 fi
 
 # ============================================================================
 # Zsh Autosuggestions
 # ============================================================================
 # Load zsh-autosuggestions if available
-if [[ -f "/etc/profiles/per-user/thanhhaikhong/share/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
-    source "/etc/profiles/per-user/thanhhaikhong/share/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
-elif [[ -f "/run/current-system/sw/share/zsh/site-functions/zsh-autosuggestions.zsh" ]]; then
-    source "/run/current-system/sw/share/zsh/site-functions/zsh-autosuggestions.zsh"
+if [[ -f "/etc/profiles/per-user/thanhhaikhong/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+    source "/etc/profiles/per-user/thanhhaikhong/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 fi
 
 # ============================================================================
