@@ -112,9 +112,9 @@
         setopt inc_append_history
 
         # Custom functions
-        function lg() { lazygit "$@"; }
+        lg() { lazygit "$@"; }
 
-        # Shell aliases (Home Manager aliases not working with standard locations)
+        # Shell aliases
         alias cat="${pkgs.bat}/bin/bat"
         alias ls="eza"
         alias ll="eza -l"
@@ -125,7 +125,7 @@
         alias vim="nvim"
         alias diff="diff-so-fancy"
 
-        # Additional zsh options for better completion
+        # Additional zsh options for better completion behavior
         setopt complete_in_word
         setopt always_to_end
         setopt auto_menu
