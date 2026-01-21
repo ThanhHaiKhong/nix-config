@@ -114,9 +114,6 @@
 
    programs.tmux = {
      enable = true;
-     plugins = with pkgs.tmuxPlugins; [
-       tpm
-     ];
      extraConfig = builtins.readFile ./tmux/tmux.conf;
    };
 
