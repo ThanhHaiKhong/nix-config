@@ -199,7 +199,7 @@
 
     # Opencode configuration
     home.file.".local/opencode" = {
-      source = builtins.path { path = ./opencode; name = "opencode-config"; };
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/tmp/nix-config/home/opencode";
       recursive = true;
     };
 }
