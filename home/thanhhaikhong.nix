@@ -175,7 +175,13 @@
   #   '';
   # };
 
-  programs.zoxide.enable = true;
+   programs.zoxide.enable = true;
+
+   # Install zsh modules explicitly
+   home.packages = with pkgs; [
+     zsh-syntax-highlighting
+     zsh-autosuggestions
+   ];
 
    programs.ssh = {
      enable = true;
