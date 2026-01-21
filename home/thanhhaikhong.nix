@@ -106,6 +106,9 @@
 
         # Better history search
         bindkey '^R' history-incremental-search-backward
+
+        # Custom functions
+        function lg() { lazygit "$@"; }
       '';
     };
 
