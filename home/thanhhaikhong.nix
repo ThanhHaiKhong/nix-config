@@ -1,6 +1,7 @@
 { config, inputs, pkgs, lib, unstablePkgs, ... }:
 {
   home.stateVersion = "23.11";
+  home.homeDirectory = "/Users/thanhhaikhong";
 
   # list of programs
   # https://mipmip.github.io/home-manager-option-search
