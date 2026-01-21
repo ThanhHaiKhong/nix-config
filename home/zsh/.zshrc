@@ -29,29 +29,9 @@ if [[ "$TERM_PROGRAM" == "vscode" ]]; then
 fi
 
 # ============================================================================
-# Pyenv initialization (for interactive shells)
+# Custom functions and aliases
 # ============================================================================
-if command -v pyenv &> /dev/null; then
-    eval "$(pyenv init --path)"
-    eval "$(pyenv init -)"
-fi
-
-# ============================================================================
-# Starship prompt (loaded after oh-my-zsh)
-# ============================================================================
-eval "$(starship init zsh)"
-
-# ============================================================================
-# Additional zsh configuration (from Home Manager initExtra)
-# ============================================================================
-# Enable vi mode
-bindkey -v
-
-# Better history search
-bindkey '^R' history-incremental-search-backward
-
-# Custom functions
-function lg() { lazygit "$@"; }
+lg() { lazygit "$@"; }
 
 # Shell aliases
 alias cat="/etc/profiles/per-user/thanhhaikhong/bin/bat"

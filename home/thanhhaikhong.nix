@@ -111,8 +111,8 @@
         setopt extended_history
         setopt inc_append_history
 
-        # Custom functions - define after shell init to avoid Nix parsing issues
-        lg() { lazygit "$@"; }
+        # Custom functions - simple approach to avoid Nix parsing issues
+        # Note: lg function defined in .zshrc directly to avoid Nix interpolation issues
 
         # Shell aliases
         alias cat="${pkgs.bat}/bin/bat"
