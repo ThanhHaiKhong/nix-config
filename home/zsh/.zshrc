@@ -42,9 +42,12 @@ if command -v pyenv &> /dev/null; then
 fi
 
 # ============================================================================
-# Starship prompt
+# Custom functions and aliases
 # ============================================================================
-eval "$(starship init zsh)"
+lg() { lazygit "$@"; }
+
+# Make ~ alone go to home directory
+~() { cd ~; }
 
 # Shell aliases
 alias cat="bat"
