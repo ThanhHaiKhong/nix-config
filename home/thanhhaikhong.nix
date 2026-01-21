@@ -114,16 +114,7 @@
         # Custom functions - simple approach to avoid Nix parsing issues
         # Note: lg function defined in .zshrc directly to avoid Nix interpolation issues
 
-        # Shell aliases
-        alias cat="${pkgs.bat}/bin/bat"
-        alias ls="eza"
-        alias ll="eza -l"
-        alias la="eza -la"
-        alias tree="eza --tree"
-        alias cd="z"
-        alias vi="nvim"
-        alias vim="nvim"
-        alias diff="diff-so-fancy"
+        # Shell aliases - defined in .zshrc to avoid Nix interpolation issues
 
         # Additional zsh options for better completion behavior
         setopt complete_in_word
