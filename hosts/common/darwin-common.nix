@@ -27,8 +27,6 @@ in
   
   
   
-   # Fix HOME environment for nix-darwin
-   environment.variables.HOME = "/Users/thanhhaikhong";
    # GitHub CLI auto-auth: add GITHUB_TOKEN to ~/.config/sops/age/keys.txt and secrets/secrets.yaml
 
   nixpkgs = {
