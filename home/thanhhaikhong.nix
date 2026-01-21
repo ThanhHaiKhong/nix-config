@@ -84,12 +84,32 @@
       enableCompletion = true;
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
+
+      # Enhanced completion settings
+      completionInit = ''
+        # Load and initialize completion system
+        autoload -Uz compinit && compinit
+
+        # Basic completion styling
+        zstyle ':completion:*' menu select
+        zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+        zstyle ':completion:*' list-colors '''${(s.:.)LS_COLORS}''
+      '';
       initExtra = ''
         # Enable vi mode
         bindkey -v
 
         # Better history search
         bindkey '^R' history-incremental-search-backward
+
+        # Enhanced history settings
+        setopt hist_ignore_all_dups
+        setopt hist_ignore_space
+        setopt hist_reduce_blanks
+        setopt hist_verify
+        setopt share_history
+        setopt extended_history
+        setopt inc_append_history
 
         # Custom functions
         function lg() { lazygit "$@"; }
@@ -104,6 +124,14 @@
         alias vi="nvim"
         alias vim="nvim"
         alias diff="diff-so-fancy"
+
+        # Additional zsh options for better completion
+        setopt complete_in_word
+        setopt always_to_end
+        setopt auto_menu
+        setopt auto_param_slash
+        setopt extended_glob
+        setopt mark_dirs
       '';
     };
 
