@@ -94,29 +94,7 @@
 
   # Zsh shell with completion, environment, and aliases
   programs.zsh = {
-    enable = true;
-    enableCompletion = true;
-
-    # Enhanced completion settings
-    completionInit = ''
-      # Load and initialize completion system
-      autoload -Uz compinit && compinit
-
-      # Basic completion styling
-      zstyle ':completion:*' menu select
-      zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
-    '';
-
-    shellAliases = {
-      cat = "${pkgs.bat}/bin/bat";
-      ls = "eza";
-      ll = "eza -l";
-      la = "eza -la";
-      tree = "eza --tree";
-      vi = "nvim";
-      vim = "nvim";
-      diff = "diff-so-fancy";
-    };
+    enable = false;
   };
 
   # Terminal emulator with Lua config
