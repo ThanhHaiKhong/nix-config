@@ -2,9 +2,9 @@
 {
   system.defaults.dock = {
     persistent-apps = [
-      "/Applications/Apps.app"
+      "System/Applications/Apps.app"
       "/Applications/AIDente.app"
-      "/Applications/System Settings.app"
+      "System/Applications/System Settings.app"
       "/Applications/ChatGPT Atlas.app"
       "/Applications/Xcode.app"
       "/Applications/Visual Studio Code.app"
