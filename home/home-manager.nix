@@ -79,50 +79,77 @@
 
   programs.bash.enable = true;
 
-  programs.zsh = {
-    enable = true;
-    enableCompletion = true;
+   programs.zsh = {
+     enable = true;
+     enableCompletion = true;
 
-    # Enhanced completion settings
-    completionInit = ''
-      # Load and initialize completion system
-      autoload -Uz compinit && compinit
+     # Enhanced completion settings
+     completionInit = ''
+       # Load and initialize completion system
+       autoload -Uz compinit && compinit
 
-      # Basic completion styling
-      zstyle ':completion:*' menu select
-      zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
-    '';
-    initExtra = ''
-      # Enable vi mode
-      bindkey -v
+       # Basic completion styling
+       zstyle ':completion:*' menu select
+       zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+     '';
 
-      # Better history search
-      bindkey "^R" history-incremental-search-backward
+     envExtra = builtins.readFile ./zsh/.zshenv;
 
-      # Enhanced history settings
-      setopt hist_ignore_all_dups
-      setopt hist_ignore_space
-      setopt hist_reduce_blanks
-      setopt hist_verify
-      setopt share_history
-      setopt extended_history
-      setopt inc_append_history
+     initExtra = builtins.readFile ./zsh/.zshrc + ''
+       # Enable vi mode
+       bindkey -v
 
-      # Additional zsh options for better completion behavior
-      setopt complete_in_word
-      setopt always_to_end
-      setopt auto_menu
-      setopt auto_param_slash
-      setopt extended_glob
-      setopt mark_dirs
-    '';
-  };
+       # Better history search
+       bindkey "^R" history-incremental-search-backward
 
-  # Zsh configuration files
-  home.file.".zshenv".source = ./zsh/.zshenv;
-  home.file.".zprofile".source = ./zsh/.zprofile;
-  home.file.".zshrc".source = ./zsh/.zshrc;
-  home.file.".zlogin".source = ./zsh/.zlogin;
+       # Enhanced history settings
+       setopt hist_ignore_all_dups
+       setopt hist_ignore_space
+       setopt hist_reduce_blanks
+       setopt hist_verify
+       setopt share_history
+       setopt extended_history
+       setopt inc_append_history
+
+       # Additional zsh options for better completion behavior
+       setopt complete_in_word
+       setopt always_to_end
+       setopt auto_menu
+       setopt auto_param_slash
+       setopt extended_glob
+       setopt mark_dirs
+
+       # Custom functions and aliases
+       lg() { lazygit "$@"; }
+
+       # Make ~ alone work as cd ~ using zsh's preexec hook
+       function precmd() {
+         # This runs before each prompt
+         # We'll use it to handle ~ alone commands
+         :
+       }
+
+       # Alternative: Use a different key binding that doesn't interfere with typing
+       # Ctrl+H will go to home directory
+       bindkey '^H' 'cd ~; zle reset-prompt'
+
+       # Note: ~ alone cannot work due to shell metacharacter expansion
+       # Use: cd ~ (standard way) or Ctrl+H (custom binding)
+     '';
+
+     shellAliases = {
+       cat = "${pkgs.bat}/bin/bat";
+       ls = "eza";
+       ll = "eza -l";
+       la = "eza -la";
+       tree = "eza --tree";
+       vi = "nvim";
+       vim = "nvim";
+       diff = "diff-so-fancy";
+     };
+   };
+
+
 
   programs.home-manager.enable = true;
   programs.nix-index.enable = true;
@@ -131,9 +158,8 @@
     extraConfig = builtins.readFile ./wezterm/wezterm.lua;
   };
 
-  programs.bat.enable = true;
-  programs.bat.config.theme = "Nord";
-  #programs.zsh.shellAliases.cat = "${pkgs.bat}/bin/bat";
+   programs.bat.enable = true;
+   programs.bat.config.theme = "Nord";
 
   # programs.neovim = {
   #   enable = true;
@@ -159,11 +185,7 @@
 
   programs.zoxide.enable = true;
 
-  # Install zsh modules explicitly
-  home.packages = with pkgs; [
-    zsh-syntax-highlighting
-    zsh-autosuggestions
-  ];
+
 
   # Enable zsh modules through Home Manager
   programs.zsh.syntaxHighlighting.enable = true;
