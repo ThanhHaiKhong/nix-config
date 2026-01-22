@@ -130,7 +130,7 @@ in
 
   # macOS configuration
   system.defaults = {
-    NSGlobalDomain.AppleShowAllExtensions = true;
+    NSGlobalDomain.AppleShowAllExtensions = false;
     NSGlobalDomain.AppleShowScrollBars = "Always";
     NSGlobalDomain.NSUseAnimatedFocusRing = false;
     NSGlobalDomain.NSNavPanelExpandedStateForSaveMode = true;
@@ -161,7 +161,7 @@ in
         DisableAllAnimations = true;
         NewWindowTarget = "PfDe";
         NewWindowTargetPath = "file://$\{HOME\}/Desktop/";
-        AppleShowAllExtensions = true;
+        AppleShowAllExtensions = false;
         FXEnableExtensionChangeWarning = false;
         ShowStatusBar = true;
         ShowPathbar = true;
@@ -198,7 +198,7 @@ in
         show-recents = false;
         show-process-indicators = true;
         orientation = "left";
-        tilesize = 36;
+        tilesize = 50;
         minimize-to-application = true;
         mineffect = "scale";
         enable-window-tool = false;
@@ -227,9 +227,7 @@ in
         CriticalUpdateInstall = 1;
       };
       "com.apple.TimeMachine".DoNotOfferNewDisksForBackup = true;
-      # Prevent Photos from opening automatically when devices are plugged in
       "com.apple.ImageCapture".disableHotPlug = true;
-      # Turn on app auto-update
       "com.apple.commerce".AutoUpdate = true;
   };
 }
