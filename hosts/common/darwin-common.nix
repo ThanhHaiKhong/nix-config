@@ -25,36 +25,28 @@ in
   # Fix HOME ownership - add user to staff group  
   users.groups.staff.members = [ username ];
   
-  
-  
-   # GitHub CLI auto-auth: add GITHUB_TOKEN to ~/.config/sops/age/keys.txt and secrets/secrets.yaml
+  # GitHub CLI auto-auth: add GITHUB_TOKEN to ~/.config/sops/age/keys.txt and secrets/secrets.yaml
 
   nixpkgs = {
     config.allowUnfree = true;
     hostPlatform = lib.mkDefault "${system}";
   };
 
-   # Essential CLI tools installed via Nix
-   environment.systemPackages = with pkgs; [
-      # Development & DevOps Tools
-      age
-      comma
-      hcloud
-      just
-      lima
-      nodejs
-      opentofu
-      pass
-      sops
-      turso-cli
-      yq
-
-       # Nix Ecosystem
-       nix
-
-       # Networking & VPN
-       tailscale
-     ];
+  # Essential CLI tools installed via Nix
+  environment.systemPackages = with pkgs; [
+    # Development & DevOps Tools
+    age
+    comma
+    hcloud
+    just
+    lima
+    nodejs
+    opentofu
+    pass
+    sops
+    nix
+    tailscale
+  ];
 
   fonts.packages = with pkgs; [
     nerd-fonts.fira-code
@@ -77,17 +69,15 @@ in
 
   programs.nix-index.enable = true;
     
-     # Fix builtins.toFile context warning
-     nix.extraOptions = [
-       "--no-warn-dirty"
-       "--quiet"
-     ];
+  # Fix builtins.toFile context warning
+  nix.extraOptions = [
+    "--no-warn-dirty"
+    "--quiet"
+  ];
 
    # SOPS for secrets
    sops.defaultSopsFile = ../secrets/secrets.yaml;
    sops.age.keyFile = "/Users/${username}/.config/sops/age/keys.txt";
-
-   
 
    # GUI Applications installed via Homebrew
    homebrew = {
@@ -157,7 +147,6 @@ in
     LaunchServices.LSQuarantine = false; # disables "Are you sure?" for new apps
     loginwindow.GuestEnabled = false;
     finder.FXPreferredViewStyle = "Nlsv";
-    
   };
 
   system.defaults.CustomUserPreferences = {
@@ -243,5 +232,4 @@ in
       # Turn on app auto-update
       "com.apple.commerce".AutoUpdate = true;
   };
-
 }

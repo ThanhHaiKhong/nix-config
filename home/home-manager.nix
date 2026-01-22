@@ -1,14 +1,17 @@
 { config, inputs, pkgs, lib, unstablePkgs, ... }:
 {
   # Home Manager version for compatibility
-  home.stateVersion = "23.11";
+  home.stateVersion = "25.11";
+  home.enableNixpkgsReleaseCheck = false;
+
+  home.sessionVariables.SHELL = "${pkgs.zsh}/bin/zsh";
   
   # User's home directory path
   home.homeDirectory = "/Users/${config.home.username}";
   
   # Enable Home Manager itself
   programs.home-manager.enable = true;
-  
+
   # Nix package indexer for fast searching
   programs.nix-index.enable = true;
   
@@ -82,24 +85,31 @@
   # Terminal file manager
   programs.lf.enable = true;
 
-  # Cross-shell prompt with custom config
-  programs.starship = {
-    enable = true;
-    enableZshIntegration = false;
-    settings = builtins.fromTOML (builtins.readFile ./starship/starship.toml);
-  };
-
   # Bash shell support
   programs.bash.enable = true;
 
   # Zsh shell with completion, environment, and aliases
   programs.zsh = {
-    enable = false;
+    enable = true;
+    enableCompletion = true;
+    shellAliases = {
+      ll = "ls -la";
+      switch = "home-manager switch --flake ~/.config/nix";
+      update = "sudo nixos-rebuild switch";
+    };
+  };
+
+  # Cross-shell prompt with custom config
+  programs.starship = {
+    enable = true;
+    enableZshIntegration = true;
+    settings = builtins.fromTOML (builtins.readFile ./starship/starship.toml);
   };
 
   # Terminal emulator with Lua config
   programs.wezterm = {
     enable = true;
+    enableZshIntegration = true;
     extraConfig = builtins.readFile ./wezterm/wezterm.lua;
   };
 
@@ -114,23 +124,16 @@
     vimAlias = true;
     vimdiffAlias = true;
     plugins = with pkgs.vimPlugins; [
-      lazy-nvim # Plugin manager
-      plenary-nvim # Core dependencies that lazy needs
+      lazy-nvim 
+      plenary-nvim
     ];
-
-    # Point to our reorganized config structure
     extraConfig = ''
-      -- Load main configuration entry point
       vim.cmd('luafile ${config.home.homeDirectory}/nvim/init.lua')
     '';
   };
 
   # Smarter directory navigation
   programs.zoxide.enable = true;
-
-  # Manual zsh plugins (disabled auto-management)
-  programs.zsh.syntaxHighlighting.enable = false;
-  programs.zsh.autosuggestion.enable = false;
 
   # SSH client configuration
   programs.ssh = {
