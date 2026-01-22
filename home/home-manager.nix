@@ -1,15 +1,20 @@
 { config, inputs, pkgs, lib, unstablePkgs, ... }:
 {
+  # Home Manager version for compatibility
   home.stateVersion = "23.11";
+  # User's home directory path
   home.homeDirectory = "/Users/${config.home.username}";
 
+  # GPG for encryption and signing
   programs.gpg.enable = true;
 
+  # Environment switcher for projects
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
   };
 
+  # Modern ls replacement with icons and git integration
   programs.eza = {
     enable = true;
     enableZshIntegration = true;
@@ -22,6 +27,7 @@
     ];
   };
 
+  # Fuzzy finder for files and commands
   programs.fzf = {
     enable = true;
     enableBashIntegration = true;
@@ -32,6 +38,7 @@
     ];
   };
 
+  # Git version control with LFS and custom settings
   programs.git = {
     enable = true;
     lfs.enable = true;
@@ -53,26 +60,32 @@
     };
   };
 
+  # Enhanced git diff output
   programs.diff-so-fancy = {
     enable = true;
     enableGitIntegration = true;
   };
 
+  # Interactive process viewer
   programs.htop = {
     enable = true;
     settings.show_program_path = true;
   };
 
+  # Terminal file manager
   programs.lf.enable = true;
 
-   programs.starship = {
-     enable = true;
-     enableZshIntegration = false;
-     settings = builtins.fromTOML (builtins.readFile ./starship/starship.toml);
-   };
+  # Cross-shell prompt with custom config
+  programs.starship = {
+    enable = true;
+    enableZshIntegration = false;
+    settings = builtins.fromTOML (builtins.readFile ./starship/starship.toml);
+  };
 
+  # Bash shell support
   programs.bash.enable = true;
 
+  # Zsh shell with completion, environment, and aliases
   programs.zsh = {
     enable = true;
     enableCompletion = true;
@@ -101,44 +114,46 @@
     };
   };
 
+  # Enable Home Manager itself
   programs.home-manager.enable = true;
+  # Nix package indexer for fast searching
   programs.nix-index.enable = true;
+  # Terminal emulator with Lua config
   programs.wezterm = {
     enable = true;
     extraConfig = builtins.readFile ./wezterm/wezterm.lua;
   };
 
-   programs.bat.enable = true;
-   programs.bat.config.theme = "Nord";
+  # Cat with syntax highlighting and Nord theme
+  programs.bat.enable = true;
+  programs.bat.config.theme = "Nord";
 
-  # programs.neovim = {
-  #   enable = true;
-  #   viAlias = true;
-  #   vimAlias = true;
-  #   vimdiffAlias = true;
-  #
-  #   # Minimal plugins - lazy.nvim handles the rest via lua/plugins.lua
-  #   plugins = with pkgs.vimPlugins; [
-  #     # Plugin manager
-  #     lazy-nvim
-  #
-  #     # Core dependencies that lazy needs
-  #     plenary-nvim
-  #   ];
-  #
-  #   # Point to our reorganized config structure
-  #   extraConfig = ''
-  #     -- Load main configuration entry point
-  #     vim.cmd('luafile ./init.lua')
-  #   '';
-  # };
+  # Neovim text editor with plugins and custom config
+  programs.neovim = {
+    enable = true;
+    viAlias = true;
+    vimAlias = true;
+    vimdiffAlias = true;
+    plugins = with pkgs.vimPlugins; [
+      lazy-nvim # Plugin manager
+      plenary-nvim # Core dependencies that lazy needs
+    ];
 
+    # Point to our reorganized config structure
+    extraConfig = ''
+      -- Load main configuration entry point
+      vim.cmd('luafile ${config.home.homeDirectory}/nvim/init.lua')
+    '';
+  };
+
+  # Smarter directory navigation
   programs.zoxide.enable = true;
 
-  # Enable zsh modules through Home Manager
+  # Manual zsh plugins (disabled auto-management)
   programs.zsh.syntaxHighlighting.enable = false;
   programs.zsh.autosuggestion.enable = false;
 
+  # SSH client configuration
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
