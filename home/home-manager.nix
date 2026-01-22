@@ -3,11 +3,6 @@
   home.stateVersion = "23.11";
   home.homeDirectory = "/Users/${config.home.username}";
 
-  # list of programs
-  # https://mipmip.github.io/home-manager-option-search
-
-
-
   programs.gpg.enable = true;
 
   programs.direnv = {
@@ -70,11 +65,11 @@
 
   programs.lf.enable = true;
 
-  programs.starship = {
-    enable = true;
-    enableZshIntegration = false;
-    settings = builtins.fromTOML (builtins.readFile ./starship/starship.toml);
-  };
+   programs.starship = {
+     enable = true;
+     enableZshIntegration = false;
+     settings = builtins.fromTOML (builtins.readFile ./starship/starship.toml);
+   };
 
   programs.bash.enable = true;
 
@@ -82,6 +77,7 @@
     enable = true;
     enableCompletion = true;
 
+    # Enhanced completion settings
     completionInit = ''
       # Load and initialize completion system
       autoload -Uz compinit && compinit
@@ -112,8 +108,8 @@
     extraConfig = builtins.readFile ./wezterm/wezterm.lua;
   };
 
-  programs.bat.enable = true;
-  programs.bat.config.theme = "Nord";
+   programs.bat.enable = true;
+   programs.bat.config.theme = "Nord";
 
   # programs.neovim = {
   #   enable = true;
@@ -139,45 +135,33 @@
 
   programs.zoxide.enable = true;
 
-  # Zsh configuration files
-  home.file.".zshenv".source = ./zsh/.zshenv;
-  home.file.".zprofile".source = ./zsh/.zprofile;
-  home.file.".zshrc".source = ./zsh/.zshrc;
-  home.file.".zlogin".source = ./zsh/.zlogin;
-
-  # Install zsh modules explicitly
-  home.packages = with pkgs; [
-    zsh-syntax-highlighting
-    zsh-autosuggestions
-  ];
-
   # Enable zsh modules through Home Manager
   programs.zsh.syntaxHighlighting.enable = false;
   programs.zsh.autosuggestion.enable = false;
 
-   programs.ssh = {
-     enable = true;
-     enableDefaultConfig = false;
-     matchBlocks = {
-       "*" = {
-         forwardAgent = false;
-         addKeysToAgent = "no";
-         compression = false;
-         serverAliveInterval = 0;
-         serverAliveCountMax = 3;
-         hashKnownHosts = false;
-         userKnownHostsFile = "~/.ssh/known_hosts";
-         controlMaster = "no";
-         controlPath = "~/.ssh/master-%r@%n:%p";
-         controlPersist = "no";
-         extraOptions = {
-           StrictHostKeyChecking = "ask";
-         };
-       };
-       "github.com" = {
-         hostname = "ssh.github.com";
-         port = 443;
-       };
-     };
-   };
+  programs.ssh = {
+    enable = true;
+    enableDefaultConfig = false;
+    matchBlocks = {
+      "*" = {
+        forwardAgent = false;
+        addKeysToAgent = "no";
+        compression = false;
+        serverAliveInterval = 0;
+        serverAliveCountMax = 3;
+        hashKnownHosts = false;
+        userKnownHostsFile = "~/.ssh/known_hosts";
+        controlMaster = "no";
+        controlPath = "~/.ssh/master-%r@%n:%p";
+        controlPersist = "no";
+        extraOptions = {
+          StrictHostKeyChecking = "ask";
+        };
+      };
+      "github.com" = {
+        hostname = "ssh.github.com";
+        port = 443;
+      };
+    };
+  };
 }
