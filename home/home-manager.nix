@@ -107,8 +107,6 @@
       zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
     '';
 
-    envExtra = builtins.readFile ./zsh/.zshenv;
-
     shellAliases = {
       cat = "${pkgs.bat}/bin/bat";
       ls = "eza";
