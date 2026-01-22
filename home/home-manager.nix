@@ -124,12 +124,15 @@
     vimAlias = true;
     vimdiffAlias = true;
     plugins = with pkgs.vimPlugins; [
-      lazy-nvim 
+      lazy-nvim
       plenary-nvim
     ];
-    extraConfig = ''
-      luafile ${config.home.homeDirectory}/nvim/init.lua
-    '';
+  };
+
+  # Neovim configuration files
+  xdg.configFile."nvim" = {
+    source = ./nvim;
+    recursive = true;
   };
 
   # Smarter directory navigation
