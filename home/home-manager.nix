@@ -97,6 +97,21 @@
       switch = "home-manager switch --flake ~/.config/nix";
       update = "sudo nixos-rebuild switch";
     };
+    autosuggestion.enable = true;
+    autosuggestion.highlight = "fg=#ff00ff,bg=cyan,bold,underline";
+    oh-my-zsh.enable = true;
+    syntaxHighlighting.enable = true;
+    syntaxHighlighting.highlighters = [ "main" "brackets" "pattern" "root" ];
+    syntaxHighlighting.patterns = {
+      directory = "fg=blue,bold";
+      symlink = "fg=cyan,underline";
+      executable = "fg=green,bold";
+    };
+    syntaxHighlighting.styles = {
+      command = "fg=yellow,bold";
+      alias = "fg=magenta,bold";
+      builtin = "fg=red,bold";
+    };
   };
 
   # Cross-shell prompt with custom config
