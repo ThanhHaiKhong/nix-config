@@ -75,11 +75,20 @@ alias vi="nvim"
 alias vim="nvim"
 alias diff="diff-so-fancy"
 
+# Handle ~ alone to cd to home
+preexec() {
+  if [[ $1 == $HOME ]]; then
+    BUFFER="cd"
+    zle accept-line
+    return 0
+  fi
+}
+
 # Zsh syntax highlighting
-source $HOME/.nix-profile/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /nix/store/ma5lp0nfk3xcx84cgi1s445yqm2b9k84-zsh-syntax-highlighting-0.8.0/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Zsh autosuggestions
-source $HOME/.nix-profile/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /nix/store/inqlj0jjiaji9vi1wr7zc14sv1xpx9f9-zsh-autosuggestions-0.7.1/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # Starship prompt
 eval "$(starship init zsh)"
