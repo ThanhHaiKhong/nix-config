@@ -2,9 +2,16 @@
 {
   # Home Manager version for compatibility
   home.stateVersion = "23.11";
+  
   # User's home directory path
   home.homeDirectory = "/Users/${config.home.username}";
-
+  
+  # Enable Home Manager itself
+  programs.home-manager.enable = true;
+  
+  # Nix package indexer for fast searching
+  programs.nix-index.enable = true;
+  
   # GPG for encryption and signing
   programs.gpg.enable = true;
 
@@ -114,10 +121,6 @@
     };
   };
 
-  # Enable Home Manager itself
-  programs.home-manager.enable = true;
-  # Nix package indexer for fast searching
-  programs.nix-index.enable = true;
   # Terminal emulator with Lua config
   programs.wezterm = {
     enable = true;
