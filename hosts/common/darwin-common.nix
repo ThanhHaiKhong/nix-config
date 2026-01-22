@@ -80,7 +80,7 @@ in
    homebrew = {
     enable = true;
     onActivation = {
-      cleanup = "uninstall";
+      cleanup = "none";
       autoUpdate = true;
       upgrade = true;
     };
