@@ -128,7 +128,7 @@
       plenary-nvim
     ];
     extraConfig = ''
-      vim.cmd('luafile ${config.home.homeDirectory}/nvim/init.lua')
+      luafile ${config.home.homeDirectory}/nvim/init.lua
     '';
   };
 

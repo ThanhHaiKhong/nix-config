@@ -37,11 +37,8 @@ in
     # Development & DevOps Tools
     age
     comma
-    hcloud
     just
-    lima
     nodejs
-    opentofu
     pass
     sops
     nix
@@ -83,7 +80,7 @@ in
    homebrew = {
     enable = true;
     onActivation = {
-      cleanup = "zap";
+      cleanup = "uninstall";
       autoUpdate = true;
       upgrade = true;
     };
@@ -105,7 +102,6 @@ in
       # Development & Terminal
       "visual-studio-code"
       "wezterm"
-      "warp"
 
       # Utilities & Tools
       "aldente"
