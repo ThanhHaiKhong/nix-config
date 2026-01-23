@@ -1,0 +1,624 @@
+#!/bin/bash
+#
+# create-tca-client - Generate a TCA (The Composable Architecture) Client Dependency
+#
+# DESCRIPTION:
+#   Creates a complete TCA client with Interface, Models, Mocks, Live implementation,
+#   and Actor for managing async state. Can create either a standalone SPM package
+#   or integrate into an existing TCA project structure.
+#
+# USAGE:
+#   create-tca-client <client_name> [path]
+#
+# ARGUMENTS:
+#   client_name    Name of the client in PascalCase (e.g., "NetworkClient")
+#                  The "Client" suffix is automatically normalized
+#   path           Optional path to TCA project root
+#                  - If omitted: Creates standalone package at current directory
+#                  - If provided: Creates inside Features/Sources/
+#
+# EXAMPLES:
+#   create-tca-client NetworkClient
+#   create-tca-client StoreKitClient ~/Projects/MyApp
+#
+# FEATURES:
+#   - Auto-detects iOS version from existing Package.swift
+#   - Generates @DependencyClient with testable mocks
+#   - Creates Live implementation with Actor for thread safety
+#   - Updates Package.swift automatically when inside TCA project
+#   - Includes comprehensive error handling
+#
+# AUTHOR:
+#   Generated for TCA development workflow
+#
+
+set -e  # Exit on error
+
+# Cleanup temporary files on exit
+# This trap ensures .tmp files created by sed are removed even on error
+cleanup() {
+    # Clean up any .tmp files created by sed in current directory and subdirectories
+    find "$(pwd)" -name "*.tmp" -type f -delete 2>/dev/null || true
+}
+trap cleanup EXIT ERR INT TERM
+
+# ANSI color codes for terminal output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'  # No Color (reset)
+
+# Utility functions for colored console output
+print_error() { echo -e "${RED}❌ $1${NC}"; }      # Print error message in red
+print_success() { echo -e "${GREEN}✅ $1${NC}"; }  # Print success message in green
+print_info() { echo -e "${YELLOW}ℹ️  $1${NC}"; }   # Print info message in yellow
+print_warning() { echo -e "${YELLOW}⚠️  $1${NC}"; } # Print warning message in yellow
+
+show_usage() {
+    cat << EOF
+Usage: create-tca-client <client_name> [path]
+
+Creates a TCA client dependency with Interface, Models, Mocks, and Live implementation.
+
+Arguments:
+    client_name    Name of the client (required, e.g., "StoreKitClient" or "NetworkClient")
+    path           Target path (optional):
+                   - If omitted: Creates standalone package at current directory
+                   - If provided: Validates TCA project and creates inside Features/Sources/
+
+Examples:
+    create-tca-client NetworkClient                              # Standalone at ./NetworkClient
+    create-tca-client StoreKitClient ~/Desktop/todo-list         # Inside ~/Desktop/todo-list/Features/Sources/
+
+Client Structure:
+    ClientName/
+    ├── Package.swift
+    ├── Sources/
+    │   ├── ClientName/
+    │   │   ├── Interface.swift
+    │   │   ├── Models.swift
+    │   │   ├── Mocks.swift
+    │   │   └── Extensions.swift
+    │   └── ClientNameLive/
+    │       └── Live.swift
+    └── Tests/
+        └── ClientNameTests/
+            └── ClientNameTests.swift
+
+EOF
+    exit 1
+}
+
+# Check for help first
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+    show_usage
+fi
+
+if [ $# -lt 1 ]; then
+    show_usage
+fi
+
+CLIENT_NAME="$1"
+TARGET_PATH="$2"
+
+# Validate client name format (PascalCase required)
+if ! [[ "$CLIENT_NAME" =~ ^[A-Z][A-Za-z0-9]*$ ]]; then
+    print_error "Invalid client name. Must start with uppercase letter (PascalCase)."
+    exit 1
+fi
+
+# Normalize client name by ensuring "Client" suffix
+# Examples:
+#   "Network" -> "NetworkClient"
+#   "NetworkClient" -> "NetworkClient" (unchanged)
+BASE_NAME="$CLIENT_NAME"
+if [[ "$CLIENT_NAME" =~ Client$ ]]; then
+    # Remove existing "Client" suffix
+    BASE_NAME="${CLIENT_NAME%Client}"
+fi
+# Add "Client" suffix for consistency
+CLIENT_NAME="${BASE_NAME}Client"
+
+# Validate TCA project structure
+#
+# Checks if the provided path contains a valid TCA project structure
+# Expected structure:
+#   - Features/ directory
+#   - Features/Sources/ directory
+#   - Features/Package.swift with swift-composable-architecture dependency
+#
+# Arguments:
+#   $1 - Path to project root directory
+#
+# Returns:
+#   0 if valid TCA project, 1 otherwise
+validate_tca_project() {
+    local project_path="$1"
+
+    # Check for Features directory
+    if [ ! -d "$project_path/Features" ]; then
+        print_error "Invalid TCA project structure at: $project_path"
+        echo ""
+        echo "Features/ directory not found"
+        echo ""
+        echo "Expected structure:"
+        echo "  $project_path/"
+        echo "  └── Features/"
+        echo "      ├── Package.swift"
+        echo "      └── Sources/"
+        echo ""
+        return 1
+    fi
+
+    if [ ! -d "$project_path/Features/Sources" ]; then
+        print_error "Invalid TCA project structure at: $project_path"
+        echo ""
+        echo "Features/Sources/ directory not found"
+        echo ""
+        return 1
+    fi
+
+    if [ ! -f "$project_path/Features/Package.swift" ]; then
+        print_error "Invalid TCA project structure at: $project_path"
+        echo ""
+        echo "Features/Package.swift not found"
+        echo ""
+        return 1
+    fi
+
+    # Verify Package.swift contains TCA dependencies
+    if ! grep -q "swift-composable-architecture" "$project_path/Features/Package.swift" 2>/dev/null; then
+        print_error "Package.swift does not contain TCA dependency"
+        echo ""
+        echo "Found Package.swift at: $project_path/Features/Package.swift"
+        echo "But it doesn't contain 'swift-composable-architecture' dependency."
+        echo ""
+        return 1
+    fi
+
+    return 0
+}
+
+# Determine target location and mode (standalone vs integrated)
+IS_STANDALONE=false
+if [ -z "$TARGET_PATH" ]; then
+    # No path provided - create standalone SPM package at current directory
+    CLIENT_DIR="$(pwd)/$CLIENT_NAME"
+    IS_STANDALONE=true
+    print_info "Creating standalone client package at current directory"
+else
+    # Path provided - validate and integrate into existing TCA project
+
+    # Safely expand tilde (~) to home directory
+    # This avoids security issues with eval while supporting ~/path syntax
+    TARGET_PATH="${TARGET_PATH/#\~/$HOME}"
+
+    # Verify target path exists
+    if [ ! -d "$TARGET_PATH" ]; then
+        print_error "Target path does not exist: $TARGET_PATH"
+        exit 1
+    fi
+
+    # Validate that target is a proper TCA project
+    if ! validate_tca_project "$TARGET_PATH"; then
+        exit 1
+    fi
+
+    print_success "Valid TCA project structure detected"
+
+    # Set paths for integration mode
+    CLIENT_DIR="$TARGET_PATH/Features/Sources/$CLIENT_NAME"
+    PACKAGE_FILE="$TARGET_PATH/Features/Package.swift"
+    print_info "Creating client inside Features package"
+fi
+
+# Check if client already exists
+if [ -d "$CLIENT_DIR" ]; then
+    print_error "Client directory already exists: $CLIENT_DIR"
+    exit 1
+fi
+
+print_info "Creating TCA client: $CLIENT_NAME"
+print_info "Base name: $BASE_NAME"
+print_info "Directory: $CLIENT_DIR"
+
+# Create directory structure
+if [ "$IS_STANDALONE" = true ]; then
+    mkdir -p "$CLIENT_DIR/Sources/$CLIENT_NAME"
+    mkdir -p "$CLIENT_DIR/Sources/${CLIENT_NAME}Live"
+    mkdir -p "$CLIENT_DIR/Tests/${CLIENT_NAME}Tests"
+else
+    mkdir -p "$CLIENT_DIR"
+    # Get the parent directory of CLIENT_DIR (should be Features/Sources)
+    PARENT_DIR=$(dirname "$CLIENT_DIR")
+    mkdir -p "$PARENT_DIR/${CLIENT_NAME}Live"
+fi
+
+print_success "Created directory structure"
+
+# Detect iOS deployment target from existing Package.swift
+# This ensures consistency with the project's minimum iOS version
+IOS_VERSION="17"  # Default to latest
+if [ -n "$PACKAGE_FILE" ] && [ -f "$PACKAGE_FILE" ]; then
+    # Search for iOS platform declaration in Package.swift
+    if grep -q "\.iOS(\.v16)" "$PACKAGE_FILE" 2>/dev/null; then
+        IOS_VERSION="16"
+    elif grep -q "\.iOS(\.v15)" "$PACKAGE_FILE" 2>/dev/null; then
+        IOS_VERSION="15"
+    fi
+fi
+
+# Create Package.swift if standalone
+if [ "$IS_STANDALONE" = true ]; then
+    cat > "$CLIENT_DIR/Package.swift" << EOF
+// swift-tools-version: 6.2
+import PackageDescription
+
+let package = Package(
+    name: "$CLIENT_NAME",
+    platforms: [
+        .iOS(.v$IOS_VERSION), .macOS(.v14)
+    ],
+    products: [
+        .singleTargetLibrary("$CLIENT_NAME"),
+        .singleTargetLibrary("${CLIENT_NAME}Live"),
+    ],
+    dependencies: [
+        .package(
+            url: "https://github.com/pointfreeco/swift-composable-architecture.git",
+            branch: "main"
+        ),
+    ],
+    targets: [
+        .target(
+            name: "$CLIENT_NAME",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            ]
+        ),
+        .target(
+            name: "${CLIENT_NAME}Live",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                "$CLIENT_NAME"
+            ]
+        ),
+        .testTarget(
+            name: "${CLIENT_NAME}Tests",
+            dependencies: [
+                "$CLIENT_NAME",
+            ]
+        ),
+    ]
+)
+
+extension Product {
+    static func singleTargetLibrary(_ name: String) -> Product {
+        .library(name: name, targets: [name])
+    }
+}
+EOF
+    print_success "Created Package.swift"
+fi
+
+# Create Interface.swift
+INTERFACE_PATH="$CLIENT_DIR/Sources/$CLIENT_NAME/Interface.swift"
+if [ "$IS_STANDALONE" = false ]; then
+    INTERFACE_PATH="$CLIENT_DIR/Interface.swift"
+fi
+
+cat > "$INTERFACE_PATH" << 'EOFINTERFACE'
+import DependenciesMacros
+import Foundation
+
+/// A dependency client for [describe the purpose].
+///
+/// `__CLIENT_NAME__` provides a testable, injectable interface for [describe functionality].
+///
+/// ## Usage
+///
+/// ```swift
+/// @Dependency(\.__CLIENT_VAR__) var __CLIENT_VAR__
+///
+/// // Use the client
+/// let result = try await __CLIENT_VAR__.performAction()
+/// ```
+///
+/// ## Testing
+///
+/// Use the provided mock implementations for testing:
+/// - `.happy` - Successful scenarios
+/// - `.failing` - Error scenarios for failure testing
+/// - `.noop` - Silent no-op implementation
+@DependencyClient
+public struct __CLIENT_NAME__: Sendable {
+
+    /// Performs a sample action.
+    ///
+    /// - Returns: A result of the action.
+    /// - Throws: An error if the action fails.
+    public var performAction: @Sendable () async throws -> String = { "" }
+}
+EOFINTERFACE
+
+# Replace template placeholders with actual client name
+# Convert PascalCase to camelCase for variable name
+# Example: "NetworkClient" -> "networkclient" -> "networkclient"
+CLIENT_VAR=$(echo "$BASE_NAME" | sed 's/\([A-Z]\)/ \1/g' | sed 's/^ //' | tr '[:upper:]' '[:lower:]' | tr -d ' ')
+
+# Perform in-place replacement using sed
+# The .tmp extension is used for macOS compatibility
+sed -i.tmp "s/__CLIENT_NAME__/$CLIENT_NAME/g" "$INTERFACE_PATH"
+sed -i.tmp "s/__CLIENT_VAR__/$CLIENT_VAR/g" "$INTERFACE_PATH"
+rm -f "$INTERFACE_PATH.tmp"  # Clean up temporary file
+
+print_success "Created Interface.swift"
+
+# Create Models.swift
+MODELS_PATH="$CLIENT_DIR/Sources/$CLIENT_NAME/Models.swift"
+if [ "$IS_STANDALONE" = false ]; then
+    MODELS_PATH="$CLIENT_DIR/Models.swift"
+fi
+
+cat > "$MODELS_PATH" << EOFMODELS
+import Foundation
+
+// MARK: - $CLIENT_NAME.Error
+
+extension $CLIENT_NAME {
+    /// Errors that can occur during $CLIENT_NAME operations.
+    public enum Error: Swift.Error, Sendable, LocalizedError {
+        /// A generic error occurred.
+        case genericError(String)
+
+        public var errorDescription: String? {
+            switch self {
+            case .genericError(let message):
+                return message
+            }
+        }
+    }
+}
+
+// MARK: - $CLIENT_NAME Models
+
+extension $CLIENT_NAME {
+    // Add your models here
+}
+EOFMODELS
+
+print_success "Created Models.swift"
+
+# Create Mocks.swift
+MOCKS_PATH="$CLIENT_DIR/Sources/$CLIENT_NAME/Mocks.swift"
+if [ "$IS_STANDALONE" = false ]; then
+    MOCKS_PATH="$CLIENT_DIR/Mocks.swift"
+fi
+
+cat > "$MOCKS_PATH" << 'EOFMOCKS'
+import Dependencies
+import Foundation
+
+extension DependencyValues {
+    public var __CLIENT_VAR__: __CLIENT_NAME__ {
+        get { self[__CLIENT_NAME__.self] }
+        set { self[__CLIENT_NAME__.self] = newValue }
+    }
+}
+
+extension __CLIENT_NAME__: TestDependencyKey {
+    public static let previewValue = Self.happy
+    public static let testValue = Self()
+}
+
+extension __CLIENT_NAME__ {
+    /// A no-op implementation that performs no actions.
+    ///
+    /// Useful for tests where you want to ensure no operations occur.
+    public static let noop = Self(
+        performAction: { "" }
+    )
+
+    /// A failing implementation that throws errors for operations.
+    ///
+    /// Useful for testing error handling paths in your code.
+    public static let failing = Self(
+        performAction: {
+            throw __CLIENT_NAME__.Error.genericError("Operation failed")
+        }
+    )
+
+    /// A successful implementation with mock data.
+    ///
+    /// Returns successful results for testing happy paths.
+    public static let happy = Self(
+        performAction: { "Success" }
+    )
+}
+EOFMOCKS
+
+sed -i.tmp "s/__CLIENT_NAME__/$CLIENT_NAME/g" "$MOCKS_PATH"
+sed -i.tmp "s/__CLIENT_VAR__/$CLIENT_VAR/g" "$MOCKS_PATH"
+rm -f "$MOCKS_PATH.tmp"
+
+print_success "Created Mocks.swift"
+
+# Create Extensions.swift
+EXTENSIONS_PATH="$CLIENT_DIR/Sources/$CLIENT_NAME/Extensions.swift"
+if [ "$IS_STANDALONE" = false ]; then
+    EXTENSIONS_PATH="$CLIENT_DIR/Extensions.swift"
+fi
+
+cat > "$EXTENSIONS_PATH" << EOFEXTENSIONS
+import Foundation
+
+// MARK: - $CLIENT_NAME Extensions
+
+extension $CLIENT_NAME {
+    // Add convenience extensions here
+}
+EOFEXTENSIONS
+
+print_success "Created Extensions.swift"
+
+# Create Live.swift
+LIVE_PATH="$CLIENT_DIR/Sources/${CLIENT_NAME}Live/Live.swift"
+if [ "$IS_STANDALONE" = false ]; then
+    PARENT_DIR=$(dirname "$CLIENT_DIR")
+    LIVE_PATH="$PARENT_DIR/${CLIENT_NAME}Live/Live.swift"
+fi
+
+cat > "$LIVE_PATH" << EOFLIVE
+import ComposableArchitecture
+import $CLIENT_NAME
+import Foundation
+
+extension $CLIENT_NAME: DependencyKey {
+    public static let liveValue: $CLIENT_NAME = {
+        return $CLIENT_NAME(
+            performAction: {
+                // Implement live action here
+                return "Live result"
+            }
+        )
+    }()
+}
+EOFLIVE
+
+print_success "Created Live.swift"
+
+# Create Actor.swift
+ACTOR_PATH="$CLIENT_DIR/Sources/${CLIENT_NAME}Live/Actor.swift"
+if [ "$IS_STANDALONE" = false ]; then
+    PARENT_DIR=$(dirname "$CLIENT_DIR")
+    ACTOR_PATH="$PARENT_DIR/${CLIENT_NAME}Live/Actor.swift"
+fi
+
+cat > "$ACTOR_PATH" << EOFACTOR
+import Foundation
+
+actor ${CLIENT_NAME}Actor {
+    // Actor implementation goes here
+
+    func performAction() async throws -> String {
+        // Implement actual logic here
+        return "Live result"
+    }
+}
+EOFACTOR
+
+print_success "Created Actor.swift"
+
+# Create test file if standalone
+if [ "$IS_STANDALONE" = true ]; then
+    cat > "$CLIENT_DIR/Tests/${CLIENT_NAME}Tests/${CLIENT_NAME}Tests.swift" << EOFTEST
+import XCTest
+@testable import $CLIENT_NAME
+
+final class ${CLIENT_NAME}Tests: XCTestCase {
+    func testExample() async throws {
+        let client = $CLIENT_NAME.happy
+        let result = try await client.performAction()
+        XCTAssertEqual(result, "Success")
+    }
+}
+EOFTEST
+    print_success "Created test file"
+fi
+
+# Update Features/Package.swift if not standalone
+# This automatically registers the new client in the package manifest
+if [ "$IS_STANDALONE" = false ]; then
+    print_info "Updating Package.swift..."
+
+    # Create backup in case update fails
+    cp "$PACKAGE_FILE" "$PACKAGE_FILE.backup"
+
+    # Add client to products array using awk
+    # This makes the client available as a package product
+    awk -v client="$CLIENT_NAME" '
+    /products: \[/ { in_products=1 }
+    in_products && /^    \],/ {
+        print "        .singleTargetLibrary(\"" client "\"),"
+        print "        .singleTargetLibrary(\"" client "Live\"),"
+        in_products=0
+    }
+    { print }
+    ' "$PACKAGE_FILE" > "$PACKAGE_FILE.tmp"
+
+    mv "$PACKAGE_FILE.tmp" "$PACKAGE_FILE"
+
+    # Add to targets
+    awk -v client="$CLIENT_NAME" '
+    /targets: \[/ { in_targets=1 }
+    in_targets && /^    \]/ && !done {
+        print "        .target("
+        print "            name: \"" client "\","
+        print "            dependencies: ["
+        print "                .product(name: \"ComposableArchitecture\", package: \"swift-composable-architecture\"),"
+        print "            ]"
+        print "        ),"
+        print "        .target("
+        print "            name: \"" client "Live\","
+        print "            dependencies: ["
+        print "                .product(name: \"ComposableArchitecture\", package: \"swift-composable-architecture\"),"
+        print "                \"" client "\","
+        print "            ]"
+        print "        ),"
+        done=1
+    }
+    { print }
+    ' "$PACKAGE_FILE" > "$PACKAGE_FILE.tmp"
+
+    mv "$PACKAGE_FILE.tmp" "$PACKAGE_FILE"
+
+    # Verify
+    if grep -q "\"$CLIENT_NAME\"" "$PACKAGE_FILE" 2>/dev/null; then
+        rm -f "$PACKAGE_FILE.backup"
+        print_success "Updated Package.swift successfully"
+    else
+        mv "$PACKAGE_FILE.backup" "$PACKAGE_FILE"
+        print_error "Failed to update Package.swift"
+    fi
+fi
+
+# Summary
+print_info "═══════════════════════════════════════════════════"
+print_success "TCA Client created successfully!"
+print_info "═══════════════════════════════════════════════════"
+echo ""
+echo "📁 Location: $CLIENT_DIR"
+echo ""
+echo "Files created:"
+if [ "$IS_STANDALONE" = true ]; then
+    echo "  - Package.swift"
+fi
+echo "  - Sources/$CLIENT_NAME/"
+echo "    - Interface.swift"
+echo "    - Models.swift"
+echo "    - Mocks.swift"
+echo "    - Extensions.swift"
+echo "  - Sources/${CLIENT_NAME}Live/"
+echo "    - Live.swift"
+echo "    - Actor.swift"
+if [ "$IS_STANDALONE" = true ]; then
+    echo "  - Tests/${CLIENT_NAME}Tests/"
+    echo "    - ${CLIENT_NAME}Tests.swift"
+fi
+echo ""
+echo "Mock implementations available:"
+echo "  - .$CLIENT_VAR // Test dependency"
+echo "  - .happy       // Successful scenarios"
+echo "  - .failing     // Error scenarios"
+echo "  - .noop        // No-op implementation"
+echo ""
+if [ "$IS_STANDALONE" = false ]; then
+    echo "✨ Client added to Features/Package.swift"
+else
+    echo "✨ Standalone package created"
+    echo ""
+    echo "To use in your project:"
+    echo "  Add as a local package dependency in Xcode"
+fi
+echo ""

@@ -251,7 +251,7 @@
        "web-search-researcher" = ./opencode/agents/web-search-researcher.md;
      };
      commands = {
-       "add-dir" = ./opencode/commands/add-dir.md;
+
      };
    };
 }

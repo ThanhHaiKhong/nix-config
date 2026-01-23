@@ -1,0 +1,788 @@
+#!/bin/bash
+#
+# swift-test - Universal Swift Project Test Runner
+#
+# DESCRIPTION:
+#   Automatically detects and runs tests for Swift projects (Xcode or SPM).
+#   Searches up to 10 directory levels to find project root.
+#   Supports code coverage, parallel testing, and test filtering.
+#
+# USAGE:
+#   swift-test [PATH] [OPTIONS]
+#
+# ARGUMENTS:
+#   PATH                  Path to project directory (optional)
+#
+# OPTIONS:
+#   --configuration, -c   Build configuration (Debug|Release) [default: Debug]
+#   --coverage           Generate code coverage report
+#   --filter, -f         Filter tests by name/pattern
+#   --parallel           Run tests in parallel
+#   --verbose, -v        Show detailed test output
+#   --scheme, -s         Specify scheme (Xcode projects)
+#   --platform, -p       Target platform (ios|macos|tvos|watchos|visionos)
+#   --device, -d         Specific device/simulator name
+#   --result-bundle      Save detailed results to xcresult bundle
+#
+# EXAMPLES:
+#   swift-test
+#   swift-test --coverage
+#   swift-test --filter FeatureTests
+#   swift-test --parallel --coverage
+#
+# FEATURES:
+#   - Auto-detects .xcworkspace, .xcodeproj, or Package.swift
+#   - Works from any subdirectory within a project
+#   - Pretty output with xcpretty when available
+#   - Supports path expansion (~, ./, ../)
+#
+# AUTHOR:
+#   Swift development tooling
+#
+
+set -e  # Exit on error
+
+# ANSI color codes for terminal output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'  # No Color (reset)
+
+# Helper functions for colored output
+print_error() {
+    echo -e "${RED}❌ $1${NC}"
+}
+
+print_success() {
+    echo -e "${GREEN}✅ $1${NC}"
+}
+
+print_info() {
+    echo -e "${YELLOW}ℹ️  $1${NC}"
+}
+
+print_warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+# Usage documentation
+show_usage() {
+    cat << EOF
+Usage: swift-test [PATH] [OPTIONS]
+
+Automatically detects and runs tests for Swift projects.
+
+Arguments:
+    PATH                  Optional path to project directory [default: current directory]
+
+Options:
+    --configuration, -c    Build configuration (Debug|Release) [default: Debug]
+    --coverage            Generate code coverage report
+    --filter, -f          Filter tests by name/pattern
+    --parallel            Run tests in parallel
+    --verbose, -v         Show detailed test output
+    --scheme, -s          Specify scheme (Xcode projects)
+    --platform, -p        Target platform (ios|macos|tvos|watchos|visionos)
+    --device, -d          Specific device/simulator name
+    --result-bundle       Save detailed results to xcresult bundle
+    --help, -h            Show this help
+
+Examples:
+    swift-test                                        # Run all tests
+    swift-test ~/Projects/MyApp                       # Test specific project
+    swift-test --coverage                             # Run with coverage
+    swift-test --filter FeatureTests                  # Run specific tests
+    swift-test --parallel --coverage                  # Parallel with coverage
+    swift-test --platform ios --device "iPhone 16 Pro" # Specific device
+    swift-test --result-bundle --coverage             # Save detailed results
+
+Notes:
+    - Works from any subdirectory within a project
+    - Auto-detects .xcworkspace, .xcodeproj, or Package.swift
+    - Searches up to 10 directory levels to find project root
+    - Supports relative paths (../, ./), absolute paths, and ~ expansion
+
+EOF
+    exit 1
+}
+
+# Default values
+CONFIGURATION="Debug"
+COVERAGE=false
+FILTER=""
+PARALLEL=false
+VERBOSE=false
+SCHEME=""
+PLATFORM=""
+DEVICE=""
+RESULT_BUNDLE=false
+RESULT_BUNDLE_PATH=""
+USE_XCPRETTY=false
+PROJECT_PATH=""
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --configuration|-c)
+            CONFIGURATION="$2"
+            if [[ "$CONFIGURATION" != "Debug" && "$CONFIGURATION" != "Release" ]]; then
+                print_error "Invalid configuration: $CONFIGURATION"
+                echo ""
+                echo "Valid options: Debug, Release"
+                exit 1
+            fi
+            shift 2
+            ;;
+        --coverage)
+            COVERAGE=true
+            shift
+            ;;
+        --filter|-f)
+            FILTER="$2"
+            shift 2
+            ;;
+        --parallel)
+            PARALLEL=true
+            shift
+            ;;
+        --verbose|-v)
+            VERBOSE=true
+            shift
+            ;;
+        --scheme|-s)
+            SCHEME="$2"
+            shift 2
+            ;;
+        --platform|-p)
+            PLATFORM="$2"
+            shift 2
+            ;;
+        --device|-d)
+            DEVICE="$2"
+            shift 2
+            ;;
+        --result-bundle)
+            RESULT_BUNDLE=true
+            shift
+            ;;
+        --help|-h)
+            show_usage
+            ;;
+        -*)
+            print_error "Unknown option: $1"
+            show_usage
+            ;;
+        *)
+            # Positional argument - treat as project path
+            if [[ -z "$PROJECT_PATH" ]]; then
+                PROJECT_PATH="$1"
+            else
+                print_error "Multiple paths specified: $PROJECT_PATH and $1"
+                show_usage
+            fi
+            shift
+            ;;
+    esac
+done
+
+# Expand path if provided (handle ~, relative paths, etc.)
+if [[ -n "$PROJECT_PATH" ]]; then
+    # Safely expand tilde
+    PROJECT_PATH="${PROJECT_PATH/#\~/$HOME}"
+    # Convert to absolute path
+    if [[ ! "$PROJECT_PATH" = /* ]]; then
+        PROJECT_PATH="$(pwd)/$PROJECT_PATH"
+    fi
+    # Verify path exists
+    if [[ ! -d "$PROJECT_PATH" ]]; then
+        print_error "Path does not exist: $PROJECT_PATH"
+        exit 1
+    fi
+fi
+
+# Find project root by searching upward
+find_project_root() {
+    # Start from PROJECT_PATH if provided, otherwise current directory
+    local current_dir="${PROJECT_PATH:-$(pwd)}"
+    local original_dir="$current_dir"
+    local max_levels=10
+    local level=0
+
+    while [[ $level -lt $max_levels ]]; do
+        # Priority 1: .xcworkspace
+        local workspaces=($(find "$current_dir" -maxdepth 1 -name "*.xcworkspace" 2>/dev/null))
+        if [[ ${#workspaces[@]} -gt 0 ]]; then
+            if [[ ${#workspaces[@]} -gt 1 ]]; then
+                print_warning "Multiple workspaces found, using first: $(basename "${workspaces[0]}")"
+            fi
+            PROJECT_TYPE="workspace"
+            PROJECT_FILE="${workspaces[0]}"
+            PROJECT_ROOT="$current_dir"
+            PROJECT_NAME=$(basename "$PROJECT_FILE" .xcworkspace)
+            return 0
+        fi
+
+        # Priority 2: .xcodeproj
+        local projects=($(find "$current_dir" -maxdepth 1 -name "*.xcodeproj" 2>/dev/null))
+        if [[ ${#projects[@]} -gt 0 ]]; then
+            if [[ ${#projects[@]} -gt 1 ]]; then
+                print_warning "Multiple projects found, using first: $(basename "${projects[0]}")"
+            fi
+            PROJECT_TYPE="project"
+            PROJECT_FILE="${projects[0]}"
+            PROJECT_ROOT="$current_dir"
+            PROJECT_NAME=$(basename "$PROJECT_FILE" .xcodeproj)
+            return 0
+        fi
+
+        # Priority 3: Package.swift
+        if [[ -f "$current_dir/Package.swift" ]]; then
+            PROJECT_TYPE="package"
+            PROJECT_FILE="Package.swift"
+            PROJECT_ROOT="$current_dir"
+            # Extract package name from Package.swift
+            PROJECT_NAME=$(grep -m 1 'name:' "$current_dir/Package.swift" | sed 's/.*name: "\(.*\)".*/\1/')
+            if [[ -z "$PROJECT_NAME" ]]; then
+                PROJECT_NAME="Package"
+            fi
+            return 0
+        fi
+
+        # Move up one directory
+        local parent_dir=$(dirname "$current_dir")
+        if [[ "$parent_dir" == "$current_dir" ]]; then
+            # Reached filesystem root
+            break
+        fi
+        current_dir="$parent_dir"
+        ((level++))
+    done
+
+    # Not found
+    print_error "No Swift project found"
+    echo ""
+    echo "Searched from: $original_dir"
+    echo "Searched up to: $level levels"
+    echo "Looking for: *.xcworkspace, *.xcodeproj, or Package.swift"
+    echo ""
+    echo "Create a new project with:"
+    echo "  create-tca-project <ProjectName>"
+    exit 1
+}
+
+# Get available simulators for a platform
+get_available_simulators() {
+    local platform=$1
+    xcrun simctl list devices available "$platform" 2>/dev/null | \
+        grep -E "^\s+" | \
+        sed 's/^[[:space:]]*//' | \
+        sed 's/ (.*//' | \
+        grep -v "^--" || echo ""
+}
+
+# Get default simulator for platform
+get_default_simulator() {
+    local platform=$1
+    local simulators=""
+
+    case "$platform" in
+        ios|iOS)
+            # Prefer Pro Max models, then Pro, then regular, then any iPhone
+            simulators=$(get_available_simulators "iOS")
+            echo "$simulators" | grep -i "pro max" | head -n 1 || \
+            echo "$simulators" | grep -i "iphone.*pro" | head -n 1 || \
+            echo "$simulators" | grep -i "iphone 16" | head -n 1 || \
+            echo "$simulators" | grep -i "iphone 15" | head -n 1 || \
+            echo "$simulators" | grep -i "iphone" | head -n 1 || echo ""
+            ;;
+        tvos|tvOS)
+            simulators=$(get_available_simulators "tvOS")
+            echo "$simulators" | grep -i "apple tv" | head -n 1 || echo ""
+            ;;
+        watchos|watchOS)
+            simulators=$(get_available_simulators "watchOS")
+            echo "$simulators" | grep -i "ultra" | head -n 1 || \
+            echo "$simulators" | grep -i "series" | head -n 1 || \
+            echo "$simulators" | grep -i "apple watch" | head -n 1 || echo ""
+            ;;
+        visionos|visionOS)
+            simulators=$(get_available_simulators "visionOS")
+            echo "$simulators" | grep -i "vision pro" | head -n 1 || echo ""
+            ;;
+        *)
+            echo ""
+            ;;
+    esac
+}
+
+# Detect default platform based on project
+detect_default_platform() {
+    # Check if Package.swift exists and contains platform info
+    if [[ -f "$PROJECT_ROOT/Package.swift" ]]; then
+        if grep -q "\.iOS" "$PROJECT_ROOT/Package.swift"; then
+            echo "ios"
+            return
+        fi
+    fi
+
+    # Check if project.yml exists (XcodeGen)
+    if [[ -f "$PROJECT_ROOT/project.yml" ]]; then
+        if grep -q "iOS" "$PROJECT_ROOT/project.yml"; then
+            echo "ios"
+            return
+        fi
+    fi
+
+    # Default to macOS as it doesn't require simulator
+    echo "macos"
+}
+
+# Validate device name exists for platform
+validate_device() {
+    local platform=$1
+    local device=$2
+
+    if [[ -z "$device" ]]; then
+        return 0  # No device specified, use default
+    fi
+
+    local available=$(get_available_simulators "$platform")
+    if echo "$available" | grep -q "^${device}$"; then
+        return 0  # Device found
+    fi
+
+    # Device not found - show available options
+    print_error "Device '$device' not found for platform $platform"
+    echo ""
+    echo "Available simulators:"
+    if [[ -n "$available" ]]; then
+        echo "$available" | sed 's/^/  - /'
+    else
+        echo "  No simulators available for $platform"
+        echo ""
+        echo "Install simulators with:"
+        echo "  xcodebuild -downloadPlatform $platform"
+    fi
+    echo ""
+    echo "Tip: Use --device with exact simulator name from list above"
+    echo "     Or omit --device to use auto-detected default"
+    exit 1
+}
+
+# Validate required tools
+validate_tools() {
+    # Check for xcodebuild (if needed)
+    if [[ "$PROJECT_TYPE" == "workspace" || "$PROJECT_TYPE" == "project" ]]; then
+        if ! command -v xcodebuild &> /dev/null; then
+            print_error "xcodebuild not found"
+            echo ""
+            echo "Install Xcode from the Mac App Store or"
+            echo "download from developer.apple.com"
+            exit 2
+        fi
+    fi
+
+    # Check for swift (if needed)
+    if [[ "$PROJECT_TYPE" == "package" ]]; then
+        if ! command -v swift &> /dev/null; then
+            print_error "swift not found"
+            echo ""
+            echo "Install Xcode Command Line Tools:"
+            echo "  xcode-select --install"
+            exit 2
+        fi
+    fi
+
+    # Check for xcpretty (optional, for pretty output)
+    if [[ "$VERBOSE" == "false" ]] && [[ "$PROJECT_TYPE" != "package" ]] && command -v xcpretty &> /dev/null; then
+        USE_XCPRETTY=true
+    fi
+}
+
+# Detect schemes for Xcode projects
+detect_schemes() {
+    if [[ "$PROJECT_TYPE" == "workspace" ]]; then
+        xcodebuild -workspace "$PROJECT_FILE" -list 2>/dev/null | \
+            awk '/Schemes:/,/^$/' | tail -n +2 | sed 's/^[[:space:]]*//' | grep -v '^$'
+    elif [[ "$PROJECT_TYPE" == "project" ]]; then
+        xcodebuild -project "$PROJECT_FILE" -list 2>/dev/null | \
+            awk '/Schemes:/,/^$/' | tail -n +2 | sed 's/^[[:space:]]*//' | grep -v '^$'
+    fi
+}
+
+# Select default test scheme
+select_default_test_scheme() {
+    local schemes=$(detect_schemes)
+    if [[ -z "$schemes" ]]; then
+        print_error "No schemes found in project"
+        exit 1
+    fi
+
+    # Prefer test schemes
+    local test_scheme=$(echo "$schemes" | grep -i "test" | head -n 1 || echo "")
+
+    if [[ -n "$test_scheme" ]]; then
+        echo "$test_scheme"
+    else
+        # Fall back to first scheme
+        echo "$schemes" | head -n 1
+    fi
+}
+
+# Construct xcodebuild test command
+construct_xcodebuild_test_command() {
+    local cmd=("xcodebuild" "test")
+
+    # Add workspace or project
+    if [[ "$PROJECT_TYPE" == "workspace" ]]; then
+        cmd+=("-workspace" "$PROJECT_FILE")
+    else
+        cmd+=("-project" "$PROJECT_FILE")
+    fi
+
+    # Add scheme
+    if [[ -z "$SCHEME" ]]; then
+        SCHEME=$(select_default_test_scheme)
+        print_info "Auto-selected scheme: $SCHEME"
+    fi
+    cmd+=("-scheme" "$SCHEME")
+
+    # Add configuration
+    cmd+=("-configuration" "$CONFIGURATION")
+
+    # Auto-detect platform if not specified
+    if [[ -z "$PLATFORM" ]]; then
+        PLATFORM=$(detect_default_platform)
+        print_info "Auto-detected platform: $PLATFORM"
+    fi
+
+    # Validate device if specified (only for non-macOS platforms)
+    if [[ "$PLATFORM" != "macos" ]] && [[ "$PLATFORM" != "macOS" ]]; then
+        validate_device "$PLATFORM" "$DEVICE"
+    fi
+
+    # Add destination based on platform
+    case "$PLATFORM" in
+        ios|iOS)
+            if [[ -n "$DEVICE" ]]; then
+                cmd+=("-destination" "platform=iOS Simulator,name=$DEVICE")
+            else
+                local default_sim=$(get_default_simulator "ios")
+                if [[ -z "$default_sim" ]]; then
+                    print_error "No iOS simulators available"
+                    echo ""
+                    echo "Install simulators with:"
+                    echo "  xcodebuild -downloadPlatform iOS"
+                    exit 1
+                fi
+                print_info "Using simulator: $default_sim"
+                cmd+=("-destination" "platform=iOS Simulator,name=$default_sim")
+            fi
+            ;;
+        macos|macOS)
+            cmd+=("-destination" "platform=macOS")
+            ;;
+        tvos|tvOS)
+            if [[ -n "$DEVICE" ]]; then
+                cmd+=("-destination" "platform=tvOS Simulator,name=$DEVICE")
+            else
+                local default_sim=$(get_default_simulator "tvos")
+                if [[ -z "$default_sim" ]]; then
+                    print_error "No tvOS simulators available"
+                    exit 1
+                fi
+                print_info "Using simulator: $default_sim"
+                cmd+=("-destination" "platform=tvOS Simulator,name=$default_sim")
+            fi
+            ;;
+        watchos|watchOS)
+            if [[ -n "$DEVICE" ]]; then
+                cmd+=("-destination" "platform=watchOS Simulator,name=$DEVICE")
+            else
+                local default_sim=$(get_default_simulator "watchos")
+                if [[ -z "$default_sim" ]]; then
+                    print_error "No watchOS simulators available"
+                    exit 1
+                fi
+                print_info "Using simulator: $default_sim"
+                cmd+=("-destination" "platform=watchOS Simulator,name=$default_sim")
+            fi
+            ;;
+        visionos|visionOS)
+            if [[ -n "$DEVICE" ]]; then
+                cmd+=("-destination" "platform=visionOS Simulator,name=$DEVICE")
+            else
+                local default_sim=$(get_default_simulator "visionos")
+                if [[ -z "$default_sim" ]]; then
+                    print_error "No visionOS simulators available"
+                    exit 1
+                fi
+                print_info "Using simulator: $default_sim"
+                cmd+=("-destination" "platform=visionOS Simulator,name=$default_sim")
+            fi
+            ;;
+        *)
+            print_warning "Unknown platform: $PLATFORM, defaulting to macOS"
+            cmd+=("-destination" "platform=macOS")
+            ;;
+    esac
+
+    # Add coverage if requested
+    if [[ "$COVERAGE" == "true" ]]; then
+        cmd+=("-enableCodeCoverage" "YES")
+    fi
+
+    # Add result bundle
+    if [[ "$RESULT_BUNDLE" == "true" ]]; then
+        local timestamp=$(date +%Y%m%d_%H%M%S)
+        RESULT_BUNDLE_PATH="$PROJECT_ROOT/TestResults_${timestamp}.xcresult"
+        cmd+=("-resultBundlePath" "$RESULT_BUNDLE_PATH")
+    fi
+
+    # Add parallel testing
+    if [[ "$PARALLEL" == "true" ]]; then
+        cmd+=("-parallel-testing-enabled" "YES")
+    fi
+
+    # Add test filter
+    if [[ -n "$FILTER" ]]; then
+        # Support multiple filter formats
+        if [[ "$FILTER" == *":"* ]]; then
+            # Full format: TargetName/TestClassName/testMethodName
+            cmd+=("-only-testing:$FILTER")
+        else
+            # Simple pattern - try to match test class or method name
+            cmd+=("-only-testing:$FILTER")
+        fi
+    fi
+
+    echo "${cmd[@]}"
+}
+
+# Construct swift test command
+construct_swift_test_command() {
+    local cmd=("swift" "test")
+
+    # Add configuration
+    if [[ "$CONFIGURATION" == "Release" ]]; then
+        cmd+=("-c" "release")
+        cmd+=("-Xswiftc" "-enable-testing")
+    else
+        cmd+=("-c" "debug")
+    fi
+
+    # Add coverage
+    if [[ "$COVERAGE" == "true" ]]; then
+        cmd+=("--enable-code-coverage")
+    fi
+
+    # Add parallel execution
+    if [[ "$PARALLEL" == "true" ]]; then
+        cmd+=("--parallel")
+    fi
+
+    # Add filter
+    if [[ -n "$FILTER" ]]; then
+        cmd+=("--filter" "$FILTER")
+    fi
+
+    # Verbose flag
+    if [[ "$VERBOSE" == "true" ]]; then
+        cmd+=("--verbose")
+    fi
+
+    echo "${cmd[@]}"
+}
+
+# Show test summary
+show_test_summary() {
+    local duration=$1
+    local status=$2
+    local exit_code=${3:-0}
+
+    print_info "═══════════════════════════════════════════════════"
+
+    if [[ "$status" == "success" ]]; then
+        print_success "Tests passed!"
+    else
+        print_error "Tests failed (exit code: $exit_code)"
+    fi
+
+    print_info "═══════════════════════════════════════════════════"
+    echo ""
+    echo "Project:       $PROJECT_NAME"
+    if [[ -n "$SCHEME" ]]; then
+        echo "Scheme:        $SCHEME"
+    fi
+    echo "Configuration: $CONFIGURATION"
+    if [[ "$COVERAGE" == "true" ]]; then
+        echo "Coverage:      Enabled"
+    fi
+    if [[ "$PARALLEL" == "true" ]]; then
+        echo "Parallel:      Enabled"
+    fi
+    if [[ -n "$FILTER" ]]; then
+        echo "Filter:        $FILTER"
+    fi
+    echo "Time:          ${duration} seconds"
+    echo ""
+
+    if [[ "$status" == "success" ]]; then
+        if [[ "$COVERAGE" == "true" ]]; then
+            echo "Coverage report:"
+            if [[ "$PROJECT_TYPE" == "package" ]]; then
+                echo "  View report:"
+                echo "    xcrun llvm-cov report .build/debug/${PROJECT_NAME}PackageTests.xctest/Contents/MacOS/${PROJECT_NAME}PackageTests -instr-profile .build/debug/codecov/default.profdata"
+                echo ""
+                echo "  Export to HTML:"
+                echo "    xcrun llvm-cov show .build/debug/${PROJECT_NAME}PackageTests.xctest/Contents/MacOS/${PROJECT_NAME}PackageTests -instr-profile .build/debug/codecov/default.profdata --format=html > coverage.html"
+            else
+                if [[ -n "$RESULT_BUNDLE_PATH" ]]; then
+                    echo "  View in Xcode:"
+                    echo "    open $RESULT_BUNDLE_PATH"
+                    echo ""
+                    echo "  Or use xcrun xccov:"
+                    echo "    xcrun xccov view --report $RESULT_BUNDLE_PATH"
+                else
+                    echo "  Open Xcode and view coverage in Report Navigator"
+                    echo "  Or use --result-bundle for detailed xcresult analysis"
+                fi
+            fi
+            echo ""
+        fi
+
+        if [[ -n "$RESULT_BUNDLE_PATH" ]]; then
+            echo "Test results bundle:"
+            echo "  Location: $RESULT_BUNDLE_PATH"
+            echo "  View in Xcode: open $RESULT_BUNDLE_PATH"
+            echo "  View test output: xcrun xcresulttool get --path $RESULT_BUNDLE_PATH"
+            echo ""
+        fi
+
+        echo "Next steps:"
+        echo "  - Run with coverage: swift-test --coverage"
+        echo "  - Filter specific tests: swift-test --filter TestName"
+        echo "  - Save detailed results: swift-test --result-bundle"
+        if [[ "$PROJECT_TYPE" == "workspace" || "$PROJECT_TYPE" == "project" ]]; then
+            echo "  - Open in Xcode: open $PROJECT_FILE"
+        fi
+    else
+        echo "Common causes:"
+        echo "  - Test assertions failed"
+        echo "  - Missing test dependencies"
+        echo "  - Runtime errors in tests"
+        echo ""
+        echo "Recovery:"
+        echo "  1. Run with --verbose for full output:"
+        echo "     swift-test --verbose"
+        if [[ "$PROJECT_TYPE" == "workspace" || "$PROJECT_TYPE" == "project" ]]; then
+            echo "  2. Open in Xcode for debugging:"
+            echo "     open $PROJECT_FILE"
+        fi
+        if [[ -n "$FILTER" ]]; then
+            echo "  3. Remove filter to see all test results:"
+            echo "     swift-test"
+        fi
+    fi
+    echo ""
+}
+
+# Execute tests
+execute_tests() {
+    local start_time=$(date +%s)
+
+    print_info "═══════════════════════════════════════════════════"
+    print_info "Project:       $PROJECT_NAME ($PROJECT_TYPE)"
+    if [[ -n "$SCHEME" ]]; then
+        print_info "Scheme:        $SCHEME"
+    fi
+    print_info "Configuration: $CONFIGURATION"
+    if [[ -n "$PLATFORM" ]]; then
+        print_info "Platform:      $PLATFORM"
+    fi
+    if [[ -n "$DEVICE" ]]; then
+        print_info "Device:        $DEVICE"
+    fi
+    if [[ "$COVERAGE" == "true" ]]; then
+        print_info "Coverage:      Enabled"
+    fi
+    if [[ "$PARALLEL" == "true" ]]; then
+        print_info "Parallel:      Enabled"
+    fi
+    if [[ -n "$FILTER" ]]; then
+        print_info "Filter:        $FILTER"
+    fi
+    if [[ "$RESULT_BUNDLE" == "true" ]]; then
+        print_info "Result Bundle: Enabled"
+    fi
+    print_info "═══════════════════════════════════════════════════"
+    echo ""
+
+    print_info "Running tests..."
+    echo ""
+
+    local exit_code=0
+    local test_output=""
+
+    if [[ "$PROJECT_TYPE" == "package" ]]; then
+        local cmd=$(construct_swift_test_command)
+        if [[ "$VERBOSE" == "true" ]]; then
+            eval "$cmd" || exit_code=$?
+        else
+            # Capture output for SPM
+            test_output=$(eval "$cmd" 2>&1)
+            exit_code=$?
+
+            # Show condensed output - disable errexit for grep
+            # We temporarily disable errexit because grep returns non-zero if no matches found
+            # This is expected behavior and shouldn't cause the script to exit
+            set +e
+            echo "$test_output" | grep -E "(error|warning|Test Case|Test Suite|Executed|passed|failed)" || true
+            set -e
+
+            # Check for test failures in output
+            # This catches cases where tests fail but swift test doesn't return non-zero
+            if echo "$test_output" | grep -q "with [1-9][0-9]* failures"; then
+                exit_code=1
+            fi
+        fi
+    else
+        local cmd=$(construct_xcodebuild_test_command)
+        if [[ "$VERBOSE" == "true" ]] || [[ "$USE_XCPRETTY" == "false" ]]; then
+            eval "$cmd" || exit_code=$?
+        else
+            eval "$cmd" 2>&1 | xcpretty --color --test || exit_code=$?
+        fi
+    fi
+
+    local end_time=$(date +%s)
+    local duration=$((end_time - start_time))
+
+    echo ""
+
+    if [[ $exit_code -eq 0 ]]; then
+        show_test_summary "$duration" "success"
+    else
+        show_test_summary "$duration" "failure" "$exit_code"
+        exit $exit_code
+    fi
+}
+
+# Main execution
+main() {
+    # Find project root
+    find_project_root
+
+    # Change to project root
+    cd "$PROJECT_ROOT"
+
+    # Validate tools
+    validate_tools
+
+    # Execute tests
+    execute_tests
+}
+
+# Run main
+main
