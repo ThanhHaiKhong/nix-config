@@ -60,11 +60,9 @@ in
 
     # requires nixpkgs.config.allowUnfree = true;
     vscode-extensions.ms-vscode-remote.remote-ssh
+    aldente
 
     # Tailscale VPN
     tailscale
-
-    # AI & Development Tools
-    opencode
   ];
 }

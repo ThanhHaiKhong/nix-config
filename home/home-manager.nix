@@ -179,4 +179,79 @@
       };
     };
   };
+
+  # MCPs
+  programs.mcp = {
+    enable = true;
+    servers = {
+      everything = {
+        command = "npx";
+        args = [
+          "-y"
+          "@modelcontextprotocol/server-everything"
+        ];
+      };
+    };
+  };
+
+   # Opencode
+   programs.opencode = {
+     enable = true;
+     package = pkgs.opencode;
+     enableMcpIntegration = true;
+     settings = {
+       agent = {
+         build = {
+           permission = {
+             task = {
+               "*" = "allow";
+               "swift-build" = "allow";
+               "swift-format" = "allow";
+               "swift-lint" = "allow";
+               "swift-classify-changes" = "allow";
+               "web-search-researcher" = "allow";
+               "thoughts-locator" = "allow";
+               "thoughts-analyzer" = "allow";
+               "codebase-pattern-finder" = "allow";
+               "codebase-locator" = "allow";
+               "codebase-analyzer" = "allow";
+             };
+           };
+         };
+         plan = {
+           permission = {
+             task = {
+               "*" = "allow";
+               "swift-build" = "allow";
+               "swift-format" = "allow";
+               "swift-lint" = "allow";
+               "swift-classify-changes" = "allow";
+               "web-search-researcher" = "allow";
+               "thoughts-locator" = "allow";
+               "thoughts-analyzer" = "allow";
+               "codebase-pattern-finder" = "allow";
+               "codebase-locator" = "allow";
+               "codebase-analyzer" = "allow";
+             };
+           };
+         };
+       };
+     };
+     rules = ../AGENTS.md;
+     agents = {
+       codebase-analyzer = ./opencode/agents/codebase-analyzer.md;
+       codebase-locator = ./opencode/agents/codebase-locator.md;
+       codebase-pattern-finder = ./opencode/agents/codebase-pattern-finder.md;
+       swift-build = ./opencode/agents/swift-build.md;
+       swift-classify-changes = ./opencode/agents/swift-classify-changes.md;
+       swift-format = ./opencode/agents/swift-format.md;
+       swift-lint = ./opencode/agents/swift-lint.md;
+       thoughts-analyzer = ./opencode/agents/thoughts-analyzer.md;
+       thoughts-locator = ./opencode/agents/thoughts-locator.md;
+       "web-search-researcher" = ./opencode/agents/web-search-researcher.md;
+     };
+     commands = {
+       "add-dir" = ./opencode/commands/add-dir.md;
+     };
+   };
 }

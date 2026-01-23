@@ -194,7 +194,7 @@ in
         show-recents = false;
         show-process-indicators = true;
         orientation = "left";
-        tilesize = 50;
+        tilesize = 48;
         minimize-to-application = true;
         mineffect = "scale";
         enable-window-tool = false;
