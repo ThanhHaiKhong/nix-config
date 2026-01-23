@@ -32,7 +32,7 @@ in
     hostPlatform = lib.mkDefault "${system}";
   };
 
-  # Essential CLI tools installed via Nix
+   # Essential CLI tools installed via Nix
   environment.systemPackages = with pkgs; [
     # Development & DevOps Tools
     age
@@ -42,7 +42,6 @@ in
     pass
     sops
     nix
-    tailscale
   ];
 
   fonts.packages = with pkgs; [
@@ -72,12 +71,15 @@ in
     "--quiet"
   ];
 
-   # SOPS for secrets
-   sops.defaultSopsFile = ../secrets/secrets.yaml;
-   sops.age.keyFile = "/Users/${username}/.config/sops/age/keys.txt";
+  # SOPS for secrets
+  sops.defaultSopsFile = ../secrets/secrets.yaml;
+  sops.age.keyFile = "/Users/${username}/.config/sops/age/keys.txt";
 
-   # GUI Applications installed via Homebrew
-   homebrew = {
+  # Tailscale VPN service
+  services.tailscale.enable = true;
+
+  # GUI Applications installed via Homebrew
+  homebrew = {
     enable = true;
     onActivation = {
       cleanup = "none";
@@ -119,7 +121,7 @@ in
     masApps = {
       "Xcode" = 497799835;
     };
-  };
+};
 
   # Add ability to used TouchID for sudo authentication
   security.pam.services.sudo_local.touchIdAuth = true;
@@ -145,8 +147,8 @@ in
     finder.FXPreferredViewStyle = "Nlsv";
   };
 
-  system.defaults.CustomUserPreferences = {
-      "com.apple.finder" = {
+system.defaults.CustomUserPreferences = {
+  "com.apple.finder" = {
         ShowExternalHardDrivesOnDesktop = true;
         ShowHardDrivesOnDesktop = false;
         ShowMountedServersOnDesktop = false;
