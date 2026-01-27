@@ -91,6 +91,7 @@ in
       "bitwarden-cli"
       "neovim"
       "gh"
+      "xcode-build-server"
     ];
     taps = [
       #"FelixKratz/formulae" #sketchybar
