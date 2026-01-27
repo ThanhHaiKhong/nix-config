@@ -103,6 +103,7 @@ in
       # Development & Terminal
       "visual-studio-code"
       "wezterm"
+      "zed"
 
       # Utilities & Tools
       "aldente"
