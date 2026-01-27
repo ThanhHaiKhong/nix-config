@@ -6,7 +6,7 @@
       "System/Applications/System Settings.app"
       "/Applications/ChatGPT Atlas.app"
       "/Applications/Xcode.app"
-      "/Applications/Visual Studio Code.app"
+      "/Applications/Zed.app"
       "/Applications/WezTerm.app"
     ];
   };
