@@ -118,14 +118,14 @@
   programs.starship = {
     enable = true;
     enableZshIntegration = true;
-    settings = builtins.fromTOML (builtins.readFile ./starship/starship.toml);
+    settings = builtins.fromTOML (builtins.readFile ./configs/starship/starship.toml);
   };
 
   # Terminal emulator with Lua config
   programs.wezterm = {
     enable = true;
     enableZshIntegration = true;
-    extraConfig = builtins.readFile ./wezterm/wezterm.lua;
+    extraConfig = builtins.readFile ./configs/wezterm/wezterm.lua;
   };
 
   # Cat with syntax highlighting and Nord theme
@@ -146,7 +146,7 @@
 
   # Neovim configuration files
   xdg.configFile."nvim" = {
-    source = ./nvim;
+    source = ./configs/nvim;
     recursive = true;
   };
 
@@ -237,18 +237,18 @@
          };
        };
      };
-     rules = ../AGENTS.md;
+     rules = ./AGENTS.md;
      agents = {
-       codebase-analyzer = ./opencode/agents/codebase-analyzer.md;
-       codebase-locator = ./opencode/agents/codebase-locator.md;
-       codebase-pattern-finder = ./opencode/agents/codebase-pattern-finder.md;
-       swift-build = ./opencode/agents/swift-build.md;
-       swift-classify-changes = ./opencode/agents/swift-classify-changes.md;
-       swift-format = ./opencode/agents/swift-format.md;
-       swift-lint = ./opencode/agents/swift-lint.md;
-       thoughts-analyzer = ./opencode/agents/thoughts-analyzer.md;
-       thoughts-locator = ./opencode/agents/thoughts-locator.md;
-       "web-search-researcher" = ./opencode/agents/web-search-researcher.md;
+codebase-analyzer = ./configs/opencode/agents/codebase-analyzer.md;
+        codebase-locator = ./configs/opencode/agents/codebase-locator.md;
+        codebase-pattern-finder = ./configs/opencode/agents/codebase-pattern-finder.md;
+        swift-build = ./configs/opencode/agents/swift-build.md;
+        swift-classify-changes = ./configs/opencode/agents/swift-classify-changes.md;
+        swift-format = ./configs/opencode/agents/swift-format.md;
+        swift-lint = ./configs/opencode/agents/swift-lint.md;
+        thoughts-analyzer = ./configs/opencode/agents/thoughts-analyzer.md;
+        thoughts-locator = ./configs/opencode/agents/thoughts-locator.md;
+        "web-search-researcher" = ./configs/opencode/agents/web-search-researcher.md;
      };
      commands = {
 

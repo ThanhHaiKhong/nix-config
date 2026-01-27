@@ -75,8 +75,7 @@ in
   sops.defaultSopsFile = ../secrets/secrets.yaml;
   sops.age.keyFile = "/Users/${username}/.config/sops/age/keys.txt";
 
-  # Tailscale VPN service
-  services.tailscale.enable = true;
+
 
   # GUI Applications installed via Homebrew
   homebrew = {
@@ -120,6 +119,7 @@ in
     ];
     masApps = {
       "Xcode" = 497799835;
+      "Tailscale" = 1475387142;
     };
 };
 

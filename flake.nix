@@ -41,6 +41,5 @@
       #   morphnix = import ./hosts/nixos/morphnix;
       #   nvllama = import ./hosts/nixos/nvllama;
       # };
-
     };
 }

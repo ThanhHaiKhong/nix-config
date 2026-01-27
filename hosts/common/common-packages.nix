@@ -62,7 +62,6 @@ in
     vscode-extensions.ms-vscode-remote.remote-ssh
     aldente
 
-    # Tailscale VPN
-    tailscale
+
   ];
 }
