@@ -145,6 +145,15 @@
   };
 
   # Neovim configuration files
+    home.file.".config/bin" = {
+    source = pkgs.runCommand "swift-bin-scripts" {} ''
+      mkdir -p $out
+      ${lib.concatMapStringsSep "\n" (script: ''
+        cp -r ${pkgs.writeShellScriptBin (builtins.baseNameOf script) (builtins.readFile script)}/bin/* $out/
+      '') (map (name: ./configs/local/bin/swift + "/${name}") (builtins.attrNames (builtins.readDir ./configs/local/bin/swift)))}
+    '';
+  };
+  home.sessionPath = [ "$HOME/.config/bin" ];
   xdg.configFile."nvim" = {
     source = ./configs/nvim;
     recursive = true;

@@ -6,5 +6,6 @@ in
   inherit (helpers)
     mkDarwin
     #mkNixos
+    swiftBinScripts
     ;
 }
