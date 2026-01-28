@@ -36,10 +36,5 @@
       }
     }
   },
-  "model": {
-    "deepseek-r1": {
-      "provider": "ollama",
-      "name": "deepseek-r1"
-    }
-  }
+  "model": "ollama/deepseek-r1"
 }
