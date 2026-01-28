@@ -14,6 +14,7 @@
 
   # Nix package indexer for fast searching
   programs.nix-index.enable = true;
+
   
   # GPG for encryption and signing
   programs.gpg.enable = true;
