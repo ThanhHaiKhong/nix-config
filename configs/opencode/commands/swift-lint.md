@@ -1,28 +1,12 @@
 ---
 description: Intelligent Swift code linter using SwiftLint with auto-fixing and comprehensive rule checking
-mode: subagent
-model: inherit
-temperature: 0.1
-tools:
-  bash: true
-  read: true
-  grep: true
-  glob: true
-  write: true
-  edit: true
-  task: true
-permission:
-  bash: allow
-  edit: allow
-  write: allow
-  task: allow
 ---
 
-You are the swift-lint subagent, an intelligent Swift code linter that uses SwiftLint for comprehensive code quality analysis.
+Lint Swift code using the swift-lint script with auto-fixing and comprehensive rule checking.
 
 ## Core Capabilities
 
-You have access to a comprehensive linting script located at `~/.local/bin/swift-lint` that provides:
+This command uses the comprehensive linting script located at `~/.config/bin/swift-lint` that provides:
 
 1. **Universal Swift Project Analysis**:
    - Lints entire projects or specific files
@@ -40,36 +24,21 @@ You have access to a comprehensive linting script located at `~/.local/bin/swift
    - JSON, CSV, HTML, Markdown for different workflows
    - GitHub Actions logging for CI/CD
 
-## Your Primary Role
+## Usage
 
-When invoked, you should:
+Run this command to lint Swift code:
 
-1. **Detect Swift files** to lint (project-wide or git changes)
-2. **Execute the swift-lint script** with appropriate parameters
-3. **Handle different modes** (lint, fix, validate)
-4. **Provide actionable feedback** on violations and fixes
+- `/swift-lint` - Lint current project with Xcode reporter
+- `/swift-lint --fix` - Auto-fix violations
+- `/swift-lint --strict` - Treat warnings as errors
+- `/swift-lint --only-rule force_cast` - Check specific rule
+- `/swift-lint --reporter json` - JSON output format
+- `/swift-lint --git-diff` - Lint only uncommitted changes
+- `/swift-lint --stats` - Show detailed statistics
 
-## Usage Patterns
+## Integration
 
-**Manual Invocation**:
-- `@swift-lint` - Lint current project with Xcode reporter
-- `@swift-lint --fix` - Auto-fix violations
-- `@swift-lint --strict` - Treat warnings as errors
-- `@swift-lint --only-rule force_cast` - Check specific rule
-- `@swift-lint --reporter json` - JSON output format
-- `@swift-lint --git-diff` - Lint only uncommitted changes
-- `@swift-lint --stats` - Show detailed statistics
-
-**Automatic Invocation**:
-Primary agents should invoke you when:
-- Code quality checks are needed
-- Before commits to catch violations early
-- After code generation or significant changes
-- In CI/CD pipelines for automated checking
-
-## Integration with Existing Script
-
-The core linting logic is handled by the existing `~/.local/bin/swift-lint` script. Your role is to:
+This command integrates with the existing `~/.config/bin/swift-lint` script to:
 - Provide intelligent parameter selection based on context
 - Handle different linting scenarios and outputs
 - Integrate with the broader OpenCode workflow
@@ -109,4 +78,4 @@ The core linting logic is handled by the existing `~/.local/bin/swift-lint` scri
 - `redundant_nil_coalescing`: Redundant nil coalescing
 - `syntactic_sugar`: Prefer syntactic sugar
 
-Always ensure the swift-lint script exists and SwiftLint tool is installed before attempting to use it. If not available, guide the user to install the required tools and configure rules appropriately.
+Always ensure the swift-lint script exists and SwiftLint tool is installed before attempting to use this command. If not available, you may need to install the required tools and configure rules appropriately.

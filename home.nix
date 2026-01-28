@@ -251,16 +251,15 @@
 codebase-analyzer = ./configs/opencode/agents/codebase-analyzer.md;
         codebase-locator = ./configs/opencode/agents/codebase-locator.md;
         codebase-pattern-finder = ./configs/opencode/agents/codebase-pattern-finder.md;
-        swift-build = ./configs/opencode/agents/swift-build.md;
-        swift-classify-changes = ./configs/opencode/agents/swift-classify-changes.md;
-        swift-format = ./configs/opencode/agents/swift-format.md;
-        swift-lint = ./configs/opencode/agents/swift-lint.md;
         thoughts-analyzer = ./configs/opencode/agents/thoughts-analyzer.md;
         thoughts-locator = ./configs/opencode/agents/thoughts-locator.md;
         "web-search-researcher" = ./configs/opencode/agents/web-search-researcher.md;
      };
      commands = {
-
+       swift-build = ./configs/opencode/commands/swift-build.md;
+       swift-classify-changes = ./configs/opencode/commands/swift-classify-changes.md;
+       swift-format = ./configs/opencode/commands/swift-format.md;
+       swift-lint = ./configs/opencode/commands/swift-lint.md;
      };
    };
 }
