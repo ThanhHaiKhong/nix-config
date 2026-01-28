@@ -36,5 +36,18 @@
       }
     }
   },
-  "model": "ollama/deepseek-r1"
+  "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama (local)",
+      "options": {
+        "baseURL": "http://localhost:11434/v1"
+      },
+      "models": {
+        "deepseek-r1": {
+          "name": "DeepSeek-R1"
+        }
+      }
+    }
+  }
 }
