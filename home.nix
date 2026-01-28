@@ -145,7 +145,7 @@
   };
 
   # Neovim configuration files
-    home.file.".config/bin" = {
+  home.file.".config/bin" = {
     source = pkgs.runCommand "swift-bin-scripts" {} ''
       mkdir -p $out
       ${lib.concatMapStringsSep "\n" (script: ''

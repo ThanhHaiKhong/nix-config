@@ -75,8 +75,6 @@ in
   sops.defaultSopsFile = ../secrets/secrets.yaml;
   sops.age.keyFile = "/Users/${username}/.config/sops/age/keys.txt";
 
-
-
   # GUI Applications installed via Homebrew
   homebrew = {
     enable = true;
@@ -92,6 +90,7 @@ in
       "neovim"
       "gh"
       "xcode-build-server"
+      "qwen-code"
     ];
     taps = [
       #"FelixKratz/formulae" #sketchybar
@@ -104,7 +103,6 @@ in
       # Development & Terminal
       "visual-studio-code"
       "wezterm"
-      "zed"
 
       # Utilities & Tools
       "aldente"
