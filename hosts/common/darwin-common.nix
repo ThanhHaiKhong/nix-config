@@ -39,6 +39,7 @@ in
     comma
     just
     nodejs
+    ollama
     pass
     sops
     nix
