@@ -102,7 +102,6 @@ in
 
       # Development & Terminal
       "visual-studio-code"
-      "wezterm"
 
       # Utilities & Tools
       "aldente"
