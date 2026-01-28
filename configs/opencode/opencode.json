@@ -35,5 +35,11 @@
         }
       }
     }
+  },
+  "model": {
+    "deepseek-r1": {
+      "provider": "ollama",
+      "name": "deepseek-r1"
+    }
   }
 }
