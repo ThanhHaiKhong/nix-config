@@ -263,4 +263,7 @@ codebase-analyzer = ./configs/opencode/agents/codebase-analyzer.md;
        swift-lint = ./configs/opencode/commands/swift-lint.md;
      };
    };
+
+   # Copy opencode.json to user config directory
+   home.file.".config/opencode/opencode.json".source = ./configs/opencode/opencode.json;
 }
