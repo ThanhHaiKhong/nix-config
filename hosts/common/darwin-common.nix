@@ -103,6 +103,7 @@ in
 
       # Development & Terminal
       "visual-studio-code"
+      "sf-symbols"
 
       # Utilities & Tools
       "aldente"
