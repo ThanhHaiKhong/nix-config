@@ -207,17 +207,10 @@
   # CLIProxyAPI configuration
   home.file.".config/cliproxyapi/config.yaml".source = ./configs/cliproxyapi/config.yaml;
   home.file.".local/bin/cliproxyapi-manager".source = ./configs/local/bin/cliproxyapi-manager.sh;
+  home.file.".local/bin/cliproxyapi-manager".executable = true;
   home.file.".config/cliproxyapi/launchd.plist".source = ./configs/local/Library/LaunchAgents/local.cliproxyapi.plist;
   home.activation = {
-    chmodCliproxyapiManager = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      if [ -f "$HOME/.local/bin/cliproxyapi-manager" ]; then
-        chmod +x "$HOME/.local/bin/cliproxyapi-manager"
-        echo "Made cliproxyapi-manager executable"
-      else
-        echo "cliproxyapi-manager not found, skipping chmod"
-      fi
-    '';
-    installCliproxyapiPlist = lib.hm.dag.entryAfter [ "chmodCliproxyapiManager" ] ''
+    installCliproxyapiPlist = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       # Copy the plist file to the LaunchAgents directory if it doesn't exist or needs updating
       mkdir -p "$HOME/Library/LaunchAgents"
       cp "$HOME/.config/cliproxyapi/launchd.plist" "$HOME/Library/LaunchAgents/local.cliproxyapi.plist"
