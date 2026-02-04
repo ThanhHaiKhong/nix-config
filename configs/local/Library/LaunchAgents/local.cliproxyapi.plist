@@ -9,22 +9,24 @@
     <array>
       <string>/bin/sh</string>
       <string>-c</string>
-      <string>exec /opt/homebrew/bin/cliproxyapi --config $HOME/.config/cliproxyapi/config.yaml &gt;&gt; /tmp/cliproxyapi.log 2&gt;&amp;1</string>
+      <string>PATH=/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.nix-profile/bin exec /opt/homebrew/bin/cliproxyapi --config $HOME/.config/cliproxyapi/config.yaml >> /tmp/cliproxyapi.log 2>&1</string>
     </array>
-    
+
     <key>RunAtLoad</key>
     <true/>
-    
+
     <key>KeepAlive</key>
     <dict>
       <key>SuccessfulExit</key>
       <false/>
     </dict>
-    
+
     <key>EnvironmentVariables</key>
     <dict>
       <key>PATH</key>
-      <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.nix-profile/bin</string>
+      <string>/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/thanhhaikhong/.nix-profile/bin</string>
+      <key>HOME</key>
+      <string>/Users/thanhhaikhong</string>
     </dict>
     
     <key>StandardOutPath</key>

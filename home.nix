@@ -205,10 +205,10 @@
   };
 
   # CLIProxyAPI configuration
-  home.file.".config/cliproxyapi/config.yaml".source = ./configs/cliproxyapi/config.yaml;
+  home.file.".config/cliproxyapi/config.yaml".text = builtins.readFile ./configs/cliproxyapi/config.yaml;
   home.file.".local/bin/cliproxyapi-manager".source = ./configs/local/bin/cliproxyapi-manager.sh;
   home.file.".local/bin/cliproxyapi-manager".executable = true;
-  home.file.".config/cliproxyapi/launchd.plist".source = ./configs/local/Library/LaunchAgents/local.cliproxyapi.plist;
+  home.file.".config/cliproxyapi/launchd.plist".text = builtins.readFile ./configs/local/Library/LaunchAgents/local.cliproxyapi.plist;
   home.activation = {
     installCliproxyapiPlist = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       # Copy the plist file to the LaunchAgents directory if it doesn't exist or needs updating
@@ -226,13 +226,15 @@
         echo "CLIProxyAPI launchd plist file is up to date"
       fi
 
-      # Load the service if it's not already loaded
-      if ! /bin/launchctl list | grep -q "local.cliproxyapi"; then
-        /bin/launchctl load "$HOME/Library/LaunchAgents/local.cliproxyapi.plist"
-        echo "Loaded CLIProxyAPI launchd service"
-      else
-        echo "CLIProxyAPI launchd service already loaded"
+      # Reload the service to ensure it picks up the latest configuration
+      if /bin/launchctl list | grep -q "local.cliproxyapi"; then
+        /bin/launchctl bootout "gui/$(id -u)/local.cliproxyapi" 2>/dev/null || true
+        echo "Unloaded previous CLIProxyAPI launchd service"
       fi
+
+      # Load the service
+      /bin/launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/local.cliproxyapi.plist"
+      echo "Loaded CLIProxyAPI launchd service"
     '';
   };
   home.packages = with pkgs; [
@@ -301,5 +303,5 @@
    };
 
    # Copy opencode.json to user config directory
-   home.file.".config/opencode/opencode.json".source = ./configs/opencode/opencode.json;
+   home.file.".config/opencode/opencode.json".text = builtins.readFile ./configs/opencode/opencode.json;
 }
