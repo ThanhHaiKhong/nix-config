@@ -207,6 +207,7 @@
   # CLIProxyAPI configuration
   home.file.".config/cliproxyapi/config.yaml".source = ./configs/cliproxyapi/config.yaml;
   home.file.".local/bin/cliproxyapi-manager".source = ./configs/local/bin/cliproxyapi-manager.sh;
+  home.file.".config/cliproxyapi/launchd.plist".source = ./configs/local/Library/LaunchAgents/local.cliproxyapi.plist;
   home.activation = {
     chmodCliproxyapiManager = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       if [ -f "$HOME/.local/bin/cliproxyapi-manager" ]; then
@@ -214,6 +215,19 @@
         echo "Made cliproxyapi-manager executable"
       else
         echo "cliproxyapi-manager not found, skipping chmod"
+      fi
+    '';
+    installCliproxyapiPlist = lib.hm.dag.entryAfter [ "chmodCliproxyapiManager" ] ''
+      # Copy the plist file to the LaunchAgents directory if it doesn't exist or needs updating
+      mkdir -p "$HOME/Library/LaunchAgents"
+      cp "$HOME/.config/cliproxyapi/launchd.plist" "$HOME/Library/LaunchAgents/local.cliproxyapi.plist"
+
+      # Load the service if it's not already loaded
+      if ! launchctl list | grep -q "local.cliproxyapi"; then
+        launchctl load "$HOME/Library/LaunchAgents/local.cliproxyapi.plist"
+        echo "Loaded CLIProxyAPI launchd service"
+      else
+        echo "CLIProxyAPI launchd service already loaded"
       fi
     '';
   };
@@ -267,7 +281,7 @@
      };
      rules = ./AGENTS.md;
      agents = {
-codebase-analyzer = ./configs/opencode/agents/codebase-analyzer.md;
+        codebase-analyzer = ./configs/opencode/agents/codebase-analyzer.md;
         codebase-locator = ./configs/opencode/agents/codebase-locator.md;
         codebase-pattern-finder = ./configs/opencode/agents/codebase-pattern-finder.md;
         thoughts-analyzer = ./configs/opencode/agents/thoughts-analyzer.md;

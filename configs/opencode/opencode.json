@@ -37,16 +37,15 @@
     }
   },
   "provider": {
-    "ollama": {
+    "cliproxyapi": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama (local)",
+      "name": "CLIProxyAPI (local)",
       "options": {
-        "baseURL": "http://localhost:11434/v1"
+        "baseURL": "http://127.0.0.1:8317/v1",
+        "apiKey": "your-api-key-here"  // Replace with one of your configured API keys in CLIProxyAPI
       },
       "models": {
-        "deepseek-r1": {
-          "name": "DeepSeek-R1"
-        }
+        
       }
     }
   }

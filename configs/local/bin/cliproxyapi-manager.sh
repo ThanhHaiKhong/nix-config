@@ -5,12 +5,27 @@
 CONFIG_DIR="$HOME/.config/cliproxyapi"
 CONFIG_FILE="$CONFIG_DIR/config.yaml"
 LAUNCHCTL_ID="local.cliproxyapi"
+DEFAULT_HOST="127.0.0.1"
+DEFAULT_PORT="8317"
+
+# Function to get the actual host and port from config
+get_config_values() {
+    if command -v yq >/dev/null 2>&1; then
+        HOST=$(yq '.host' "$CONFIG_FILE" 2>/dev/null || echo "$DEFAULT_HOST")
+        PORT=$(yq '.port' "$CONFIG_FILE" 2>/dev/null || echo "$DEFAULT_PORT")
+    else
+        # Fallback to default values if yq is not available
+        HOST="$DEFAULT_HOST"
+        PORT="$DEFAULT_PORT"
+    fi
+}
 
 case "$1" in
   start)
     echo "Starting CLIProxyAPI..."
     launchctl kickstart -k "gui/$(id -u)/$LAUNCHCTL_ID"
-    echo "CLIProxyAPI should now be running on http://127.0.0.1:8317"
+    get_config_values
+    echo "CLIProxyAPI should now be running on http://$HOST:$PORT"
     ;;
   stop)
     echo "Stopping CLIProxyAPI..."
@@ -21,13 +36,15 @@ case "$1" in
     launchctl bootout "gui/$(id -u)/$LAUNCHCTL_ID" 2>/dev/null
     sleep 2
     launchctl kickstart -k "gui/$(id -u)/$LAUNCHCTL_ID"
-    echo "CLIProxyAPI restarted and should be running on http://127.0.0.1:8317"
+    get_config_values
+    echo "CLIProxyAPI restarted and should be running on http://$HOST:$PORT"
     ;;
   status)
     echo "Checking CLIProxyAPI status..."
     if launchctl list | grep -q "$LAUNCHCTL_ID"; then
+      get_config_values
       echo "CLIProxyAPI is running"
-      echo "Access it at: http://127.0.0.1:8317"
+      echo "Access it at: http://$HOST:$PORT"
     else
       echo "CLIProxyAPI is not running"
     fi
@@ -39,26 +56,63 @@ case "$1" in
     ;;
   logs)
     echo "Displaying CLIProxyAPI logs..."
-    tail -f /tmp/cliproxyapi.log
+    if [ -f /tmp/cliproxyapi.log ]; then
+      tail -f /tmp/cliproxyapi.log
+    else
+      echo "Log file does not exist yet. Start the service first."
+    fi
     ;;
   test)
     echo "Testing CLIProxyAPI connection..."
-    if curl -sf http://127.0.0.1:8317/ >/dev/null 2>&1; then
-      echo "CLIProxyAPI is accessible at http://127.0.0.1:8317"
+    get_config_values
+    if curl -sf http://$HOST:$PORT/v1/models >/dev/null 2>&1; then
+      echo "CLIProxyAPI is accessible at http://$HOST:$PORT"
+      echo "Available models:"
+      curl -s http://$HOST:$PORT/v1/models | jq -r '.data[].id' 2>/dev/null || echo "(Install 'jq' to see formatted output)"
     else
-      echo "CLIProxyAPI is not responding at http://127.0.0.1:8317"
+      echo "CLIProxyAPI is not responding at http://$HOST:$PORT"
       echo "Make sure the service is running: cliproxyapi-manager status"
     fi
     ;;
+  health)
+    echo "Checking CLIProxyAPI health..."
+    get_config_values
+    if curl -sf http://$HOST:$PORT/health >/dev/null 2>&1; then
+      curl -s http://$HOST:$PORT/health | jq '.' 2>/dev/null || cat <(curl -s http://$HOST:$PORT/health)
+    else
+      echo "Health check failed. Service may not be running."
+    fi
+    ;;
+  config-validate)
+    echo "Validating CLIProxyAPI configuration..."
+    if command -v yq >/dev/null 2>&1; then
+      if yq '.' "$CONFIG_FILE" >/dev/null 2>&1; then
+        echo "Configuration file is valid YAML"
+        echo "Current configuration summary:"
+        echo "  Host: $(yq '.host' "$CONFIG_FILE" 2>/dev/null || echo "Not set")"
+        echo "  Port: $(yq '.port' "$CONFIG_FILE" 2>/dev/null || echo "Not set")"
+        echo "  API Keys configured: $(yq '.api-keys | length' "$CONFIG_FILE" 2>/dev/null || echo "0")"
+        echo "  Debug mode: $(yq '.debug' "$CONFIG_FILE" 2>/dev/null || echo "false")"
+      else
+        echo "Configuration file has YAML syntax errors!"
+        exit 1
+      fi
+    else
+      echo "yq command not found. Install yq to validate configuration."
+      exit 1
+    fi
+    ;;
   *)
-    echo "Usage: $0 {start|stop|restart|status|edit-config|logs|test}"
-    echo "  start        - Start the CLIProxyAPI service"
-    echo "  stop         - Stop the CLIProxyAPI service"
-    echo "  restart      - Restart the CLIProxyAPI service"
-    echo "  status       - Check if CLIProxyAPI is running"
-    echo "  edit-config  - Edit the configuration file"
-    echo "  logs         - View service logs"
-    echo "  test         - Test if the service is responding"
+    echo "Usage: $0 {start|stop|restart|status|edit-config|logs|test|health|config-validate}"
+    echo "  start            - Start the CLIProxyAPI service"
+    echo "  stop             - Stop the CLIProxyAPI service"
+    echo "  restart          - Restart the CLIProxyAPI service"
+    echo "  status           - Check if CLIProxyAPI is running"
+    echo "  edit-config      - Edit the configuration file"
+    echo "  logs             - View service logs"
+    echo "  test             - Test if the service is responding and list available models"
+    echo "  health           - Check the health status of the service"
+    echo "  config-validate  - Validate the configuration file syntax and show summary"
     exit 1
     ;;
 esac
