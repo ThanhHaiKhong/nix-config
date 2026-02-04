@@ -213,7 +213,18 @@
     installCliproxyapiPlist = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       # Copy the plist file to the LaunchAgents directory if it doesn't exist or needs updating
       mkdir -p "$HOME/Library/LaunchAgents"
-      cp "$HOME/.config/cliproxyapi/launchd.plist" "$HOME/Library/LaunchAgents/local.cliproxyapi.plist"
+
+      # Check if the file already exists and differs
+      if [ ! -f "$HOME/Library/LaunchAgents/local.cliproxyapi.plist" ] || ! cmp -s "$HOME/.config/cliproxyapi/launchd.plist" "$HOME/Library/LaunchAgents/local.cliproxyapi.plist"; then
+        # Remove the existing file if it exists (to handle read-only files)
+        rm -f "$HOME/Library/LaunchAgents/local.cliproxyapi.plist"
+
+        # Copy the file with proper permissions
+        cp "$HOME/.config/cliproxyapi/launchd.plist" "$HOME/Library/LaunchAgents/local.cliproxyapi.plist"
+        echo "Copied CLIProxyAPI launchd plist file"
+      else
+        echo "CLIProxyAPI launchd plist file is up to date"
+      fi
 
       # Load the service if it's not already loaded
       if ! launchctl list | grep -q "local.cliproxyapi"; then
