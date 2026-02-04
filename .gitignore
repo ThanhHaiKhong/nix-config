@@ -2,3 +2,9 @@ result
 com.googlecode.iterm2.plist
 .direnv
 .DS_Store
+# Secrets
+secrets/secrets.yaml
+
+# CLIProxyAPI runtime files
+.cli-proxy-api/
+~/.cli-proxy-api/
