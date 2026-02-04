@@ -209,7 +209,12 @@
   home.file.".local/bin/cliproxyapi-manager".source = ./configs/local/bin/cliproxyapi-manager.sh;
   home.activation = {
     chmodCliproxyapiManager = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      chmod +x "$HOME/.local/bin/cliproxyapi-manager"
+      if [ -f "$HOME/.local/bin/cliproxyapi-manager" ]; then
+        chmod +x "$HOME/.local/bin/cliproxyapi-manager"
+        echo "Made cliproxyapi-manager executable"
+      else
+        echo "cliproxyapi-manager not found, skipping chmod"
+      fi
     '';
   };
   home.packages = with pkgs; [
