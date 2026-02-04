@@ -227,8 +227,8 @@
       fi
 
       # Load the service if it's not already loaded
-      if ! launchctl list | grep -q "local.cliproxyapi"; then
-        launchctl load "$HOME/Library/LaunchAgents/local.cliproxyapi.plist"
+      if ! /bin/launchctl list | grep -q "local.cliproxyapi"; then
+        /bin/launchctl load "$HOME/Library/LaunchAgents/local.cliproxyapi.plist"
         echo "Loaded CLIProxyAPI launchd service"
       else
         echo "CLIProxyAPI launchd service already loaded"

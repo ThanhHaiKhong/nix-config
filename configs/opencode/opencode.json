@@ -39,7 +39,7 @@
   "provider": {
     "cliproxyapi": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "CLIProxyAPI (local)",
+      "name": "CLIProxyAPI",
       "options": {
         "baseURL": "http://127.0.0.1:8317/v1",
         "apiKey": "sk-cliproxyapi-1234567890abcdef"
