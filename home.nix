@@ -204,6 +204,19 @@
     };
   };
 
+  # CLIProxyAPI configuration
+  home.file.".config/cliproxyapi/config.yaml".source = ./configs/cliproxyapi/config.yaml;
+  home.file.".local/bin/cliproxyapi-manager".source = ./configs/local/bin/cliproxyapi-manager.sh;
+  home.activation = {
+    chmodCliproxyapiManager = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      chmod +x "$HOME/.local/bin/cliproxyapi-manager"
+    '';
+  };
+  home.packages = with pkgs; [
+    # Install CLIProxyAPI via home-manager's home.packages if available in nixpkgs
+    # Since it's not in nixpkgs, we'll rely on the nix-homebrew module to handle it
+  ];
+
    # Opencode
    programs.opencode = {
      enable = true;
