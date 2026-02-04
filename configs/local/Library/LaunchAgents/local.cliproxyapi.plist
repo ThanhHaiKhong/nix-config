@@ -9,7 +9,7 @@
     <array>
       <string>/bin/sh</string>
       <string>-c</string>
-      <string>exec /usr/local/bin/cliproxyapi --config $HOME/.config/cliproxyapi/config.yaml &gt;&gt; /tmp/cliproxyapi.log 2&gt;&amp;1</string>
+      <string>exec /opt/homebrew/bin/cliproxyapi --config $HOME/.config/cliproxyapi/config.yaml &gt;&gt; /tmp/cliproxyapi.log 2&gt;&amp;1</string>
     </array>
     
     <key>RunAtLoad</key>

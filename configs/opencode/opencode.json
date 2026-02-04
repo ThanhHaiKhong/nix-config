@@ -42,10 +42,18 @@
       "name": "CLIProxyAPI (local)",
       "options": {
         "baseURL": "http://127.0.0.1:8317/v1",
-        "apiKey": "your-api-key-here"  // Replace with one of your configured API keys in CLIProxyAPI
+        "apiKey": "sk-cliproxyapi-1234567890abcdef"
       },
       "models": {
-        
+        "qwen3-coder-plus": {
+          "name": "Qwen 3 Coder Plus"
+        },
+        "qwen3-coder-flash": {
+          "name": "Qwen 3 Coder Flash"
+        },
+        "vision-model": {
+          "name": "Vision Model"
+        }
       }
     }
   }
