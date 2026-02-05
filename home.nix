@@ -248,6 +248,13 @@
   home.file.".local/bin/cliproxyapi-ensure-ready".source = ./configs/cliproxyapi/ensure-ready.sh;
   home.file.".local/bin/cliproxyapi-ensure-ready".executable = true;
 
+  # Add a shell function to ensure CLIProxyAPI is running before opencode
+  programs.zsh.shellAliases = {
+    opencode = ''
+      cliproxyapi-ensure-ready && command opencode "$@"
+    '';
+  };
+
 
    # Opencode
    programs.opencode = {
