@@ -264,10 +264,10 @@
     yq
   ];
 
-  # Add a shell function to ensure CLIProxyAPI is running before opencode
+  # Add a shell function to ensure CLIProxyAPI is running and logged in before opencode
   programs.zsh.shellAliases = {
     opencode = ''
-      cliproxyapi-ensure-ready && command opencode "$@"
+      $HOME/.config/cliproxyapi/enhanced-opencode-wrapper.sh "$@"
     '';
   };
 
