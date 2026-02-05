@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>local.cliproxyapi</string>
+
+    <key>ProgramArguments</key>
+    <array>
+      <string>cliproxyapi</string>
+      <string>--config</string>
+      <string>$HOME/.config/cliproxyapi/config.yaml</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <dict>
+      <key>SuccessfulExit</key>
+      <false/>
+    </dict>
+
+    <!-- Health check to ensure the service is responsive -->
+    <key>WatchPaths</key>
+    <array>
+      <string>$HOME/.config/cliproxyapi/config.yaml</string>
+    </array>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+      <!-- Dynamically constructed PATH to include common locations -->
+      <key>PATH</key>
+      <string>/run/current-system/sw/bin:/nix/var/nix/profiles/per-user/$USER/profile/bin:/nix/var/nix/profiles/default/bin:/run/wrappers/bin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+      <key>HOME</key>
+      <string>/Users/thanhhaikhong</string>
+      <!-- Add logging configuration -->
+      <key>CLIProxyAPI_LOG_LEVEL</key>
+      <string>INFO</string>
+    </dict>
+
+    <!-- Resource limits -->
+    <key>SoftResourceLimits</key>
+    <dict>
+      <key>NumberOfFiles</key>
+      <integer>4096</integer>
+      <key>ResidentSetSize</key>
+      <integer>1073741824</integer> <!-- 1GB in bytes -->
+    </dict>
+
+    <key>HardResourceLimits</key>
+    <dict>
+      <key>NumberOfFiles</key>
+      <integer>8192</integer>
+    </dict>
+
+    <!-- Graceful shutdown handling -->
+    <key>ThrottleInterval</key>
+    <integer>30</integer>
+
+    <!-- Signal handling -->
+    <key>AbandonProcessGroup</key>
+    <false/>
+
+    <!-- StandardOut and StandardError paths for additional logging -->
+    <key>StandardOutPath</key>
+    <string>/tmp/cliproxyapi.stdout.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/cliproxyapi.stderr.log</string>
+
+  </dict>
+</plist>

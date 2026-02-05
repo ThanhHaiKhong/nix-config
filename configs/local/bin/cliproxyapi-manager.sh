@@ -93,7 +93,7 @@ case "$1" in
     ;;
   update)
     echo "Managing CLIProxyAPI updates..."
-    $HOME/.config/cliproxyapi/update-manager.sh "${@:2}"
+    $HOME/.config/cliproxyapi/enhanced-update-manager.sh "${@:2}"
     ;;
   ensure-ready)
     echo "Ensuring CLIProxyAPI is running and logged in..."

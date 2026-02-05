@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>local.cliproxyapi.monitoring</string>
+
+    <key>ProgramArguments</key>
+    <array>
+      <string>/bin/bash</string>
+      <string>-c</string>
+      <string>source ~/.zshrc; $HOME/.config/cliproxyapi/enhanced-monitoring.sh</string>
+    </array>
+
+    <!-- Run every 5 minutes -->
+    <key>StartInterval</key>
+    <integer>300</integer>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+      <key>PATH</key>
+      <string>/run/current-system/sw/bin:/nix/var/nix/profiles/per-user/$USER/profile/bin:/nix/var/nix/profiles/default/bin:/run/wrappers/bin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+      <key>HOME</key>
+      <string>/Users/thanhhaikhong</string>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/cliproxyapi-monitoring.stdout.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/cliproxyapi-monitoring.stderr.log</string>
+
+  </dict>
+</plist>
