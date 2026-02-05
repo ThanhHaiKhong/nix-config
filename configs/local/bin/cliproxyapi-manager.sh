@@ -95,6 +95,10 @@ case "$1" in
     echo "Managing CLIProxyAPI updates..."
     $HOME/.config/cliproxyapi/update-manager.sh "${@:2}"
     ;;
+  ensure-ready)
+    echo "Ensuring CLIProxyAPI is running and logged in..."
+    $HOME/.config/cliproxyapi/ensure-ready.sh
+    ;;
   discover)
     echo "Discovering CLIProxyAPI configuration and capabilities..."
     echo "For detailed documentation, see: $HOME/.config/cliproxyapi/README.md"
@@ -186,7 +190,7 @@ case "$1" in
     $HOME/.config/cliproxyapi/validate-config.sh "$CONFIG_FILE"
     ;;
   *)
-    echo "Usage: $0 {start|stop|graceful-stop|restart|status|edit-config|templates|security-setup|backup|performance|integration|update|discover|logs|runtime-info|test|health|health-full|config-validate|config-full-validate}"
+    echo "Usage: $0 {start|stop|graceful-stop|restart|status|edit-config|templates|security-setup|backup|performance|integration|update|ensure-ready|discover|logs|runtime-info|test|health|health-full|config-validate|config-full-validate}"
     echo "  start              - Start the CLIProxyAPI service"
     echo "  stop               - Stop the CLIProxyAPI service"
     echo "  graceful-stop      - Gracefully stop the CLIProxyAPI service"
@@ -199,6 +203,7 @@ case "$1" in
     echo "  performance        - Monitor performance metrics"
     echo "  integration        - Manage service integrations"
     echo "  update             - Manage updates and version info"
+    echo "  ensure-ready       - Ensure CLIProxyAPI is running and logged in"
     echo "  discover           - Discover configuration and capabilities"
     echo "  logs               - View service logs from system log"
     echo "  runtime-info       - Show information about runtime directory"

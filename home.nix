@@ -244,6 +244,11 @@
     yq
   ];
 
+  # Add the CLIProxyAPI readiness script to PATH
+  home.file.".local/bin/cliproxyapi-ensure-ready".source = ./configs/cliproxyapi/ensure-ready.sh;
+  home.file.".local/bin/cliproxyapi-ensure-ready".executable = true;
+
+
    # Opencode
    programs.opencode = {
      enable = true;
