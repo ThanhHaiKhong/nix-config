@@ -158,26 +158,27 @@ in
 {
   options.programs.cliproxyapi = {
     enable = mkEnableOption "CLIProxyAPI";
-    
+
+    # Deprecated: API keys should be managed through sops-nix
     apiKeys = mkOption {
       type = types.listOf types.str;
       default = [];
-      description = "List of API keys for CLIProxyAPI";
+      description = "List of API keys for CLIProxyAPI (deprecated: use sops-nix)";
     };
-    
+
     package = mkOption {
       type = types.package;
       default = pkgs.cliproxyapi;
       defaultText = "pkgs.cliproxyapi";
       description = "The CLIProxyAPI package to use";
     };
-    
+
     enableManager = mkOption {
       type = types.bool;
       default = true;
       description = "Whether to enable the CLIProxyAPI manager script";
     };
-    
+
     enableMonitoring = mkOption {
       type = types.bool;
       default = true;
@@ -189,24 +190,13 @@ in
     # Install the CLIProxyAPI package
     home.packages = [ cfg.package ];
     
-    # Use sops-nix to manage secrets
-    sops.secrets."cliproxyapi/api-keys" = {
-      neededForUsers = true;
-      # This creates a file containing the decrypted API keys
-    };
-
     # Create the configuration file with reference to the secret
-    home.file.".config/cliproxyapi/config.yaml".text =
-      let
-        # Read the base config template
-        baseConfig = builtins.readFile ./../../configs/cliproxyapi/config.yaml;
-        # Replace the api-keys section with a reference to the secret
-        configWithSecretRef = lib.replaceStrings
-          [ "api-keys:\n  - \"sk-cliproxyapi-1234567890abcdef\"\n  - \"sk-cliproxyapi-fedcba0987654321\"\n  - \"sk-cliproxyapi-1357924680abcdef\"" ]
-          [ "# API keys managed by sops-nix\n# Referenced in the Nix configuration\napi-keys: []" ]
-          baseConfig;
-      in
-      configWithSecretRef;
+    # The actual API keys will be injected at runtime using a script
+    home.file.".config/cliproxyapi/config.yaml".source = ./../../configs/cliproxyapi/config.yaml;
+
+    # Create a script to update the config with decrypted API keys at runtime
+    home.file.".config/cliproxyapi/update-config-with-keys.sh".source = ./../../configs/cliproxyapi/update-config-with-keys.sh;
+    home.file.".config/cliproxyapi/update-config-with-keys.sh".executable = true;
     
     # Install the management script if enabled
     home.file.".local/bin/cliproxyapi-manager".source = ./../../configs/local/bin/cliproxyapi-manager.sh;
@@ -225,18 +215,18 @@ in
     
     # Install the monitoring launchd plist if monitoring is enabled
     home.file.".config/cliproxyapi/monitoring.plist".source = ./../../configs/local/Library/LaunchAgents/local.cliproxyapi.monitoring.plist;
-    
+
     # Install the readiness script
     home.file.".local/bin/cliproxyapi-ensure-ready".source = ./../../configs/cliproxyapi/ensure-ready.sh;
     home.file.".local/bin/cliproxyapi-ensure-ready".executable = true;
-    
+
     # Add a shell function to ensure CLIProxyAPI is running before opencode
     programs.zsh.shellAliases = mkIf (config.programs.opencode.enable or false) {
       opencode = ''
         cliproxyapi-ensure-ready && command opencode "$@"
       '';
     };
-    
+
     # Activation script to install the launchd plist
     home.activation.installCliproxyapiPlist = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       # Copy the plist file to the LaunchAgents directory if it doesn't exist or needs updating
@@ -264,7 +254,18 @@ in
       /bin/launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/local.cliproxyapi.plist"
       echo "Loaded CLIProxyAPI launchd service"
     '';
-    
+
+    # Activation script to update the config with decrypted API keys after secrets are available
+    home.activation.updateCliproxyapiConfig = lib.hm.dag.entryAfter [ "installCliproxyapiPlist" ] ''
+      if [ -f "$HOME/.local/share/cliproxyapi-api-keys/secret" ]; then
+        echo "Updating CLIProxyAPI config with API keys from secrets..."
+        $HOME/.config/cliproxyapi/update-config-with-keys.sh
+      else
+        echo "Warning: Decrypted secrets file not found at $HOME/.local/share/cliproxyapi-api-keys/secret"
+        echo "Make sure sops-nix is properly configured and secrets are decrypted"
+      fi
+    '';
+
     # Activation script to install the monitoring launchd plist if enabled
     home.activation.installCliproxyapiMonitoring = mkIf cfg.enableMonitoring (lib.hm.dag.entryAfter [ "installCliproxyapiPlist" ] ''
       # Copy the monitoring plist file to the LaunchAgents directory

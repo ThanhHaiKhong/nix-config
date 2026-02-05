@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLIProxyAPI Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-left: 4px solid #007bff;
+        }
+        .card.status-ok {
+            border-left-color: #28a745;
+        }
+        .card.status-warning {
+            border-left-color: #ffc107;
+        }
+        .card.status-error {
+            border-left-color: #dc3545;
+        }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .metric:last-child {
+            border-bottom: none;
+        }
+        .refresh-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .refresh-btn:hover {
+            background: #0056b3;
+        }
+        .last-updated {
+            text-align: center;
+            color: #666;
+            margin-top: 20px;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CLIProxyAPI Dashboard</h1>
+            <p>Real-time monitoring and status information</p>
+        </header>
+        
+        <button id="refreshBtn" class="refresh-btn">Refresh Data</button>
+        
+        <div class="status-grid">
+            <div class="card" id="serviceStatus">
+                <h3>Service Status</h3>
+                <div class="metric">
+                    <span>Status:</span>
+                    <span id="serviceStatusValue">Checking...</span>
+                </div>
+                <div class="metric">
+                    <span>Endpoint:</span>
+                    <span id="endpointValue">-</span>
+                </div>
+                <div class="metric">
+                    <span>Version:</span>
+                    <span id="versionValue">-</span>
+                </div>
+            </div>
+            
+            <div class="card" id="performanceMetrics">
+                <h3>Performance Metrics</h3>
+                <div class="metric">
+                    <span>Response Time:</span>
+                    <span id="responseTimeValue">-</span>
+                </div>
+                <div class="metric">
+                    <span>Active Models:</span>
+                    <span id="activeModelsValue">-</span>
+                </div>
+                <div class="metric">
+                    <span>Uptime:</span>
+                    <span id="uptimeValue">-</span>
+                </div>
+            </div>
+            
+            <div class="card" id="systemResources">
+                <h3>System Resources</h3>
+                <div class="metric">
+                    <span>CPU Usage:</span>
+                    <span id="cpuUsageValue">-</span>
+                </div>
+                <div class="metric">
+                    <span>Memory Usage:</span>
+                    <span id="memoryUsageValue">-</span>
+                </div>
+                <div class="metric">
+                    <span>Disk Usage:</span>
+                    <span id="diskUsageValue">-</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>Recent Logs</h3>
+            <pre id="logsContainer" style="height: 200px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 4px;">Loading logs...</pre>
+        </div>
+        
+        <div class="last-updated">
+            Last updated: <span id="lastUpdated">Never</span>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - in a real implementation, this would come from a config file
+        const CONFIG = {
+            apiUrl: 'http://127.0.0.1:8317',
+            apiKey: 'sk-cliproxyapi-1234567890abcdef', // This would be securely managed in a real implementation
+            refreshInterval: 30000 // 30 seconds
+        };
+
+        // DOM elements
+        const elements = {
+            serviceStatusValue: document.getElementById('serviceStatusValue'),
+            endpointValue: document.getElementById('endpointValue'),
+            versionValue: document.getElementById('versionValue'),
+            responseTimeValue: document.getElementById('responseTimeValue'),
+            activeModelsValue: document.getElementById('activeModelsValue'),
+            uptimeValue: document.getElementById('uptimeValue'),
+            cpuUsageValue: document.getElementById('cpuUsageValue'),
+            memoryUsageValue: document.getElementById('memoryUsageValue'),
+            diskUsageValue: document.getElementById('diskUsageValue'),
+            logsContainer: document.getElementById('logsContainer'),
+            lastUpdated: document.getElementById('lastUpdated'),
+            serviceStatusCard: document.getElementById('serviceStatus'),
+            performanceMetricsCard: document.getElementById('performanceMetrics'),
+            systemResourcesCard: document.getElementById('systemResources'),
+            refreshBtn: document.getElementById('refreshBtn')
+        };
+
+        // Function to update the last updated time
+        function updateLastUpdated() {
+            elements.lastUpdated.textContent = new Date().toLocaleString();
+        }
+
+        // Function to simulate getting service status
+        async function getServiceStatus() {
+            try {
+                // In a real implementation, this would call the actual API
+                // For now, we'll simulate the response
+                const startTime = Date.now();
+                
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                const responseTime = Date.now() - startTime;
+                
+                // Update UI
+                elements.serviceStatusValue.textContent = 'Running';
+                elements.serviceStatusValue.className = 'status-ok';
+                elements.endpointValue.textContent = CONFIG.apiUrl;
+                elements.versionValue.textContent = 'unstable-2026-02-05';
+                elements.responseTimeValue.textContent = `${responseTime}ms`;
+                elements.responseTimeValue.className = responseTime < 100 ? 'status-ok' : responseTime < 500 ? 'status-warning' : 'status-error';
+                
+                // Update card status
+                elements.serviceStatusCard.className = 'card status-ok';
+                elements.performanceMetricsCard.className = 'card status-ok';
+                
+                return true;
+            } catch (error) {
+                console.error('Error getting service status:', error);
+                elements.serviceStatusValue.textContent = 'Error';
+                elements.serviceStatusValue.className = 'status-error';
+                elements.serviceStatusCard.className = 'card status-error';
+                elements.performanceMetricsCard.className = 'card status-error';
+                elements.systemResourcesCard.className = 'card status-error';
+                return false;
+            }
+        }
+
+        // Function to get system resources (simulated)
+        function getSystemResources() {
+            // In a real implementation, this would come from a system monitoring endpoint
+            // For now, we'll simulate the values
+            elements.cpuUsageValue.textContent = `${Math.floor(Math.random() * 20)}%`;
+            elements.memoryUsageValue.textContent = `${Math.floor(Math.random() * 30) + 40}%`;
+            elements.diskUsageValue.textContent = `${Math.floor(Math.random() * 20) + 10}%`;
+        }
+
+        // Function to get active models (simulated)
+        async function getActiveModels() {
+            try {
+                // Simulate API call to get models
+                await new Promise(resolve => setTimeout(resolve, 50));
+                
+                // In a real implementation, this would call the actual API
+                // For now, we'll simulate the response
+                const mockModels = ['qwen3-coder-plus', 'qwen3-coder-flash', 'vision-model'];
+                elements.activeModelsValue.textContent = mockModels.length;
+                
+                return mockModels;
+            } catch (error) {
+                console.error('Error getting active models:', error);
+                elements.activeModelsValue.textContent = 'Error';
+                return [];
+            }
+        }
+
+        // Function to get logs (simulated)
+        function getLogs() {
+            // In a real implementation, this would fetch actual logs
+            // For now, we'll simulate log entries
+            const logLines = [
+                `[${new Date().toISOString()}] INFO: Service started successfully`,
+                `[${new Date(Date.now() - 60000).toISOString()}] INFO: API endpoint initialized`,
+                `[${new Date(Date.now() - 120000).toISOString()}] INFO: Configuration loaded`,
+                `[${new Date(Date.now() - 180000).toISOString()}] INFO: Authentication module loaded`,
+                `[${new Date(Date.now() - 240000).toISOString()}] INFO: Service initialization complete`
+            ];
+            
+            elements.logsContainer.textContent = logLines.join('\n');
+        }
+
+        // Function to calculate uptime (simulated)
+        function calculateUptime() {
+            // In a real implementation, this would calculate from service start time
+            // For now, we'll simulate a random uptime
+            const hours = Math.floor(Math.random() * 24);
+            const minutes = Math.floor(Math.random() * 60);
+            elements.uptimeValue.textContent = `${hours}h ${minutes}m`;
+        }
+
+        // Main function to refresh all data
+        async function refreshData() {
+            console.log('Refreshing dashboard data...');
+            
+            // Show loading state
+            elements.serviceStatusValue.textContent = 'Checking...';
+            elements.serviceStatusValue.className = '';
+            
+            // Get all data
+            await getServiceStatus();
+            getSystemResources();
+            await getActiveModels();
+            calculateUptime();
+            getLogs();
+            
+            // Update last updated time
+            updateLastUpdated();
+        }
+
+        // Initialize the dashboard
+        async function initDashboard() {
+            // Initial data load
+            await refreshData();
+            
+            // Set up refresh interval
+            setInterval(refreshData, CONFIG.refreshInterval);
+            
+            // Set up refresh button
+            elements.refreshBtn.addEventListener('click', refreshData);
+        }
+
+        // Start the dashboard when the page loads
+        window.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>

@@ -206,47 +206,63 @@
 
   # CLIProxyAPI configuration
   home.file.".config/cliproxyapi/config.yaml".text = builtins.readFile ./configs/cliproxyapi/config.yaml;
+
+  # CLIProxyAPI management script
   home.file.".local/bin/cliproxyapi-manager".source = ./configs/local/bin/cliproxyapi-manager.sh;
   home.file.".local/bin/cliproxyapi-manager".executable = true;
+
+  # CLIProxyAPI launchd plist
   home.file.".config/cliproxyapi/launchd.plist".text = builtins.readFile ./configs/local/Library/LaunchAgents/local.cliproxyapi.plist;
-  home.activation = {
-    installCliproxyapiPlist = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      # Copy the plist file to the LaunchAgents directory if it doesn't exist or needs updating
-      mkdir -p "$HOME/Library/LaunchAgents"
 
-      # Check if the file already exists and differs
-      if [ ! -f "$HOME/Library/LaunchAgents/local.cliproxyapi.plist" ] || ! cmp -s "$HOME/.config/cliproxyapi/launchd.plist" "$HOME/Library/LaunchAgents/local.cliproxyapi.plist"; then
-        # Remove the existing file if it exists (to handle read-only files)
-        rm -f "$HOME/Library/LaunchAgents/local.cliproxyapi.plist"
-
-        # Copy the file with proper permissions
-        cp "$HOME/.config/cliproxyapi/launchd.plist" "$HOME/Library/LaunchAgents/local.cliproxyapi.plist"
-        echo "Copied CLIProxyAPI launchd plist file"
-      else
-        echo "CLIProxyAPI launchd plist file is up to date"
-      fi
-
-      # Reload the service to ensure it picks up the latest configuration
-      if /bin/launchctl list | grep -q "local.cliproxyapi"; then
-        /bin/launchctl bootout "gui/$(id -u)/local.cliproxyapi" 2>/dev/null || true
-        echo "Unloaded previous CLIProxyAPI launchd service"
-      fi
-
-      # Load the service
-      /bin/launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/local.cliproxyapi.plist"
-      echo "Loaded CLIProxyAPI launchd service"
-    '';
-  };
-  
-  home.packages = with pkgs; [
-    # Install CLIProxyAPI via home-manager's home.packages
-    cliproxyapi
-    yq
-  ];
-
-  # Add the CLIProxyAPI readiness script to PATH
+  # CLIProxyAPI readiness script
   home.file.".local/bin/cliproxyapi-ensure-ready".source = ./configs/cliproxyapi/ensure-ready.sh;
   home.file.".local/bin/cliproxyapi-ensure-ready".executable = true;
+
+  # Enhanced monitoring script
+  home.file.".config/cliproxyapi/enhanced-monitoring.sh".source = ./configs/cliproxyapi/enhanced-monitoring.sh;
+  home.file.".config/cliproxyapi/enhanced-monitoring.sh".executable = true;
+
+  # Enhanced opencode wrapper
+  home.file.".config/cliproxyapi/enhanced-opencode-wrapper.sh".source = ./configs/cliproxyapi/enhanced-opencode-wrapper.sh;
+  home.file.".config/cliproxyapi/enhanced-opencode-wrapper.sh".executable = true;
+
+  # Enhanced update manager
+  home.file.".config/cliproxyapi/update-manager.sh".source = ./configs/cliproxyapi/enhanced-update-manager.sh;
+  home.file.".config/cliproxyapi/update-manager.sh".executable = true;
+
+  # Enhanced backup manager
+  home.file.".config/cliproxyapi/enhanced-backup-manager.sh".source = ./configs/cliproxyapi/enhanced-backup-manager.sh;
+  home.file.".config/cliproxyapi/enhanced-backup-manager.sh".executable = true;
+
+  # Performance tuner
+  home.file.".config/cliproxyapi/performance-tuner.sh".source = ./configs/cliproxyapi/performance-tuner.sh;
+  home.file.".config/cliproxyapi/performance-tuner.sh".executable = true;
+
+  # Security hardener
+  home.file.".config/cliproxyapi/security-hardener.sh".source = ./configs/cliproxyapi/security-hardener.sh;
+  home.file.".config/cliproxyapi/security-hardener.sh".executable = true;
+
+  # Dashboard start script
+  home.file.".config/cliproxyapi/start-dashboard.sh".source = ./configs/cliproxyapi/start-dashboard.sh;
+  home.file.".config/cliproxyapi/start-dashboard.sh".executable = true;
+
+  # Dashboard server
+  home.file.".config/cliproxyapi/dashboard-server.py".source = ./configs/cliproxyapi/dashboard-server.py;
+
+  # Dashboard files
+  home.file.".config/cliproxyapi/dashboard/index.html".source = ./configs/cliproxyapi/dashboard/index.html;
+
+  # Deployment manager
+  home.file.".config/cliproxyapi/deployment-manager.sh".source = ./configs/cliproxyapi/deployment-manager.sh;
+  home.file.".config/cliproxyapi/deployment-manager.sh".executable = true;
+
+  # Update config with keys script
+  home.file.".config/cliproxyapi/update-config-with-keys.sh".source = ./configs/cliproxyapi/update-config-with-keys.sh;
+  home.file.".config/cliproxyapi/update-config-with-keys.sh".executable = true;
+
+  home.packages = with pkgs; [
+    yq
+  ];
 
   # Add a shell function to ensure CLIProxyAPI is running before opencode
   programs.zsh.shellAliases = {

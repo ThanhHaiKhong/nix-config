@@ -1,0 +1,8 @@
+keys:
+  - &current_user: age108rwl3ghezw97cwn76h9ucd4xpxlxwqudye0tvdr9w7j77tyj9ks2f2dlr
+
+creation_rules:
+  - path_regex: secrets/cliproxyapi-secrets.yaml$
+    key_groups:
+      - age:
+        - *current_user

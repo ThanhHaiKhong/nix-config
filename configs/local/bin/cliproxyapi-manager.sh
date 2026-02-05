@@ -79,13 +79,21 @@ case "$1" in
     echo "Setting up security for CLIProxyAPI..."
     $HOME/.config/cliproxyapi/security-setup.sh
     ;;
+  harden)
+    echo "Hardening CLIProxyAPI security..."
+    $HOME/.config/cliproxyapi/security-hardener.sh "${@:2}"
+    ;;
   backup)
     echo "Managing CLIProxyAPI backups..."
-    $HOME/.config/cliproxyapi/backup-manager.sh "${@:2}"
+    $HOME/.config/cliproxyapi/enhanced-backup-manager.sh "${@:2}"
     ;;
   performance)
     echo "Monitoring CLIProxyAPI performance..."
-    $HOME/.config/cliproxyapi/performance-monitor.sh
+    $HOME/.config/cliproxyapi/performance-monitor.sh "${@:2}"
+    ;;
+  tune)
+    echo "Tuning CLIProxyAPI performance..."
+    $HOME/.config/cliproxyapi/performance-tuner.sh "${@:2}"
     ;;
   integration)
     echo "Managing CLIProxyAPI integrations..."
@@ -189,8 +197,16 @@ case "$1" in
     echo "Performing full configuration validation..."
     $HOME/.config/cliproxyapi/validate-config.sh "$CONFIG_FILE"
     ;;
+  deploy)
+    echo "Managing CLIProxyAPI deployments..."
+    $HOME/.config/cliproxyapi/deployment-manager.sh "${@:2}"
+    ;;
+  dashboard)
+    echo "Starting CLIProxyAPI dashboard..."
+    $HOME/.config/cliproxyapi/start-dashboard.sh "${@:2}"
+    ;;
   *)
-    echo "Usage: $0 {start|stop|graceful-stop|restart|status|edit-config|templates|security-setup|backup|performance|integration|update|ensure-ready|discover|logs|runtime-info|test|health|health-full|config-validate|config-full-validate}"
+    echo "Usage: $0 {start|stop|graceful-stop|restart|status|edit-config|templates|security-setup|backup|performance|integration|update|ensure-ready|discover|logs|runtime-info|test|health|health-full|config-validate|config-full-validate|deploy}"
     echo "  start              - Start the CLIProxyAPI service"
     echo "  stop               - Stop the CLIProxyAPI service"
     echo "  graceful-stop      - Gracefully stop the CLIProxyAPI service"
@@ -212,6 +228,10 @@ case "$1" in
     echo "  health-full        - Perform comprehensive health check"
     echo "  config-validate    - Validate the configuration file syntax and show summary"
     echo "  config-full-validate - Perform comprehensive configuration validation"
+    echo "  deploy             - Manage deployments and rollbacks"
+    echo "  dashboard          - Start the web dashboard for monitoring"
+    echo "  tune               - Tune performance and optimize configuration"
+    echo "  harden             - Harden security and audit events"
     exit 1
     ;;
 esac
