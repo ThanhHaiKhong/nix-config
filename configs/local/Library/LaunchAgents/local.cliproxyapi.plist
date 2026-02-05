@@ -7,9 +7,9 @@
     
     <key>ProgramArguments</key>
     <array>
-      <string>/bin/sh</string>
-      <string>-c</string>
-      <string>PATH=/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.nix-profile/bin exec /opt/homebrew/bin/cliproxyapi --config $HOME/.config/cliproxyapi/config.yaml >> /tmp/cliproxyapi.log 2>&1</string>
+      <string>cliproxyapi</string>
+      <string>--config</string>
+      <string>$HOME/.config/cliproxyapi/config.yaml</string>
     </array>
 
     <key>RunAtLoad</key>
@@ -29,10 +29,5 @@
       <string>/Users/thanhhaikhong</string>
     </dict>
     
-    <key>StandardOutPath</key>
-    <string>/tmp/cliproxyapi.log</string>
-    
-    <key>StandardErrorPath</key>
-    <string>/tmp/cliproxyapi.log</string>
   </dict>
 </plist>

@@ -237,9 +237,10 @@
       echo "Loaded CLIProxyAPI launchd service"
     '';
   };
+  
   home.packages = with pkgs; [
-    # Install CLIProxyAPI via home-manager's home.packages if available in nixpkgs
-    # Since it's not in nixpkgs, we'll rely on the nix-homebrew module to handle it
+    # Install CLIProxyAPI via home-manager's home.packages
+    cliproxyapi
   ];
 
    # Opencode

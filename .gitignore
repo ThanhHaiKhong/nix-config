@@ -8,3 +8,4 @@ secrets/secrets.yaml
 # CLIProxyAPI runtime files
 .cli-proxy-api/
 ~/.cli-proxy-api/
+~/.local/share/cli-proxy-api/

@@ -92,7 +92,6 @@ in
       "gh"
       "xcode-build-server"
       "qwen-code"
-      "cliproxyapi"
     ];
     taps = [
       #"FelixKratz/formulae" #sketchybar
