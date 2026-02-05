@@ -30,7 +30,7 @@
     <key>EnvironmentVariables</key>
     <dict>
       <key>PATH</key>
-      <string>/run/current-system/sw/bin:/etc/profiles/per-user/$USER/bin:$PATH</string>
+      <string>/run/current-system/sw/bin:/nix/var/nix/profiles/per-user/$USER/profile/bin:/nix/var/nix/profiles/default/bin:/run/wrappers/bin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
       <key>HOME</key>
       <string>/Users/thanhhaikhong</string>
     </dict>
