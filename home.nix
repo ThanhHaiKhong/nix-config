@@ -241,6 +241,7 @@
   home.packages = with pkgs; [
     # Install CLIProxyAPI via home-manager's home.packages
     cliproxyapi
+    yq
   ];
 
    # Opencode

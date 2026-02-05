@@ -1,0 +1,162 @@
+# CLIProxyAPI Configuration Template - Production Environment
+# This configuration is optimized for production use
+
+# Server Configuration
+host: "127.0.0.1" # Bind to localhost only for security
+port: 8317 # Default port
+
+# TLS Configuration
+tls:
+  enable: false # Enable TLS for HTTPS (set to true if you have certificates)
+  cert: "" # Path to TLS certificate file
+  key: "" # Path to TLS private key file
+
+# Management API Settings
+remote-management:
+  # Switch to enable remote management. If you deploy it on a server,
+  # you need to set it to true to use EasyCLI or WebUI to connect to CLIProxyAPI
+  # for management.
+  # If you only use the API for local management, you can keep it as false.
+  allow-remote: false
+  # If you want to use EasyCLI or WebUI to manage CLIProxyAPI through the API,
+  # you must set a Key.
+  # If it is not set, it is considered that the API management function is
+  # disabled, and you cannot use EasyCLI or WebUI to connect.
+  # If you do not need to use EasyCLI or WebUI for management, you can leave it
+  # blank.
+  secret-key: ""
+  # Switch to integrate WebUI.
+  # Set to false, you can open WebUI through
+  # http://YOUR_SERVER_IP:8317/management.html
+  disable-control-panel: true  # Disable control panel in production
+  panel-github-repository: "https://github.com/router-for-me/Cli-Proxy-API-Management-Center"
+
+# Authentication Settings
+# Directory for storing authentication files, used to store authentication files
+# for Gemini CLI, Gemini Web, Qwen Code, and Codex.
+# The default setting is the .cli-proxy-api folder in your current account
+# directory, which is compatible with Windows and Linux environments.
+# The program will automatically create this folder when it starts for the first
+# time.
+# The default in Windows is C:\Users\your_username\.cli-proxy-api
+# The default in Linux is /home/your_username\.cli-proxy-api
+# If you use a non-default location in a Windows environment, you need to
+# modify it in this format "Z:\\CLIProxyAPI\\auths"
+auth-dir: "~/.local/share/cli-proxy-api"
+
+# The keys required for various AI clients to access CLIProxyAPI are set here.
+# Do not confuse them with the various keys below.
+# In layman's terms, the Key here is what CLIProxyAPI needs to set as a
+# server.
+# The various keys below are what CLIProxyAPI needs as a client to access the
+# server.
+api-keys:
+  - "sk-cliproxyapi-prod-1234567890abcdef"
+  - "sk-cliproxyapi-prod-fedcba0987654321"
+  - "sk-cliproxyapi-prod-1357924680abcdef"
+
+# Logging and Debugging
+# Whether to enable Debug information in the log, it is disabled by default.
+# You only need to turn it on when the author needs to cooperate in
+# troubleshooting.
+debug: false  # Disable debug in production
+# Hidden configuration, which can record every request and response and save it
+# to the logs directory.
+# The size of each log may be as high as 10MB+. Please do not enable it if your
+# hard disk is not large enough.
+request-log: false  # Disable request logging in production for performance
+# Whether to redirect the log to a log file.
+# It is enabled by default, and the log will be saved in the logs folder in the
+# program directory.
+# If it is turned off, the log will be displayed in the console.
+logging-to-file: false  # Use system logging in production
+# Maximum total size of log files in MB (0 disables rotation)
+logs-max-total-size-mb: 0
+# Switch for usage statistics, enabled by default.
+# You need to use the API to view the usage, you can use EasyCLI or WebUI to
+# view it.
+usage-statistics-enabled: true
+
+# Performance and Operation
+commercial-mode: true # Enable commercial mode for better performance in production
+# If you want to use a proxy, you need to make the following settings, which
+# support socks5/http/https protocols.
+# Fill in according to this format "socks5://user:[email protected]:1080/"
+proxy-url: ""
+force-model-prefix: false # When true, unprefixed model requests only use credentials without a prefix
+# The number of times the program automatically retries the request when it
+# encounters error codes such as 403, 408, 500, 502, 503, 504.
+request-retry: 2  # Lower retries in production to reduce resource usage
+max-retry-interval: 15 # Shorter interval in production
+
+# Quota and Routing
+# Processing behavior after the model is restricted.
+quota-exceeded:
+  # The core configuration of multi-account polling.
+  # When set to true, for example, if an account triggers a 429, the program
+  # will automatically switch to the next account to re-initiate the request.
+  # When set to false, the program will send the 429 error message to the
+  # client and end the current request.
+  # That is to say, when it is set to true, as long as at least one of the
+  # polling accounts is normal, the client will not report an error.
+  # When it is set to false, the client needs to retry or abort the operation.
+  switch-project: true
+  # Gemini CLI exclusive configuration, applicable to Gemini 2.5 Pro and
+  # Gemini 2.5 Flash models.
+  # When the official version quota is used up, it will automatically switch to
+  # the Preview model. Just keep it on.
+  switch-preview-model: true
+routing:
+  strategy: "round-robin" # Strategy for selecting credentials when multiple match (options: "round-robin", "fill-first")
+
+# WebSocket and Streaming
+# AIStudio authentication switch. When set to true, the above api-keys will be
+# used to authenticate AIStudio Build APP access.
+ws-auth: false
+nonstream-keepalive-interval: 0 # Emit blank lines every N seconds for non-streaming responses to prevent idle timeouts (0 disables)
+codex-instructions-enabled: false # Enable official Codex instructions injection for Codex API requests
+
+# Streaming Behavior
+streaming:
+  keepalive-seconds: 10 # Shorter keepalive in production
+  bootstrap-retries: 1 # Retries before first byte is sent (0 disables)
+
+# Model Configuration
+# Define model aliases and exclusions
+models: []
+#  - name: "gpt-4-vision-preview"
+#    alias: "gpt-4-vision"
+#  - name: "claude-3-opus-20240229"
+#    alias: "claude-3-opus"
+
+# Excluded models (using wildcards)
+excluded-models: []
+
+# Payload manipulation settings
+payload-manipulation:
+  # Default values to add to requests
+  defaults: {}
+  # Values to override in requests
+  overrides: {}
+  # Filters to apply to requests
+  filters: {}
+
+# Provider-specific configurations
+providers:
+
+oauth-model-alias:
+  antigravity:
+    - name: rev19-uic3-1p
+      alias: gemini-2.5-computer-use-preview-10-2025
+    - name: gemini-3-pro-image
+      alias: gemini-3-pro-image-preview
+    - name: gemini-3-pro-high
+      alias: gemini-3-pro-preview
+    - name: gemini-3-flash
+      alias: gemini-3-flash-preview
+    - name: claude-sonnet-4-5
+      alias: gemini-claude-sonnet-4-5
+    - name: claude-sonnet-4-5-thinking
+      alias: gemini-claude-sonnet-4-5-thinking
+    - name: claude-opus-4-5-thinking
+      alias: gemini-claude-opus-4-5-thinking

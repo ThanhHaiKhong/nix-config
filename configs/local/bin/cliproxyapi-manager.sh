@@ -32,6 +32,22 @@ case "$1" in
     echo "Stopping CLIProxyAPI..."
     launchctl bootout "gui/$(id -u)/$LAUNCHCTL_ID"
     ;;
+  graceful-stop)
+    echo "Gracefully stopping CLIProxyAPI..."
+    get_config_values
+    # Try to send a shutdown signal via API if available
+    if curl -sf --max-time 5 -X POST http://$HOST:$PORT/shutdown >/dev/null 2>&1; then
+      echo "Shutdown signal sent via API"
+    else
+      echo "API shutdown endpoint not available, using launchctl"
+    fi
+    sleep 2
+    # Check if process is still running and use launchctl if needed
+    if launchctl list | grep -q "$LAUNCHCTL_ID"; then
+      launchctl bootout "gui/$(id -u)/$LAUNCHCTL_ID"
+    fi
+    echo "CLIProxyAPI stopped gracefully"
+    ;;
   restart)
     echo "Restarting CLIProxyAPI..."
     launchctl bootout "gui/$(id -u)/$LAUNCHCTL_ID" 2>/dev/null
@@ -54,6 +70,56 @@ case "$1" in
     echo "Opening CLIProxyAPI configuration file..."
     ${EDITOR:-nano} "$CONFIG_FILE"
     echo "After saving changes, restart the service for changes to take effect: cliproxyapi-manager restart"
+    ;;
+  templates)
+    echo "Managing CLIProxyAPI configuration templates..."
+    $HOME/.config/cliproxyapi/template-manager.sh "${@:2}"
+    ;;
+  security-setup)
+    echo "Setting up security for CLIProxyAPI..."
+    $HOME/.config/cliproxyapi/security-setup.sh
+    ;;
+  backup)
+    echo "Managing CLIProxyAPI backups..."
+    $HOME/.config/cliproxyapi/backup-manager.sh "${@:2}"
+    ;;
+  performance)
+    echo "Monitoring CLIProxyAPI performance..."
+    $HOME/.config/cliproxyapi/performance-monitor.sh
+    ;;
+  integration)
+    echo "Managing CLIProxyAPI integrations..."
+    $HOME/.config/cliproxyapi/integration-manager.sh "${@:2}"
+    ;;
+  update)
+    echo "Managing CLIProxyAPI updates..."
+    $HOME/.config/cliproxyapi/update-manager.sh "${@:2}"
+    ;;
+  discover)
+    echo "Discovering CLIProxyAPI configuration and capabilities..."
+    echo "For detailed documentation, see: $HOME/.config/cliproxyapi/README.md"
+    echo ""
+    echo "=== CLIProxyAPI Discovery ==="
+    echo "Service Status:"
+    if pgrep -f "cliproxyapi" >/dev/null 2>&1; then
+      echo "  Status: Running"
+      # Get host and port
+      if command -v yq >/dev/null 2>&1 && [ -f "$CONFIG_FILE" ]; then
+        HOST=$(yq '.host' "$CONFIG_FILE" 2>/dev/null || echo "127.0.0.1")
+        PORT=$(yq '.port' "$CONFIG_FILE" 2>/dev/null || echo "8317")
+        echo "  Endpoint: http://$HOST:$PORT"
+      fi
+    else
+      echo "  Status: Not running"
+    fi
+    echo ""
+    echo "Configuration:"
+    echo "  Config file: $CONFIG_FILE"
+    echo "  Runtime dir: $RUNTIME_DIR"
+    echo "  Launchd ID: $LAUNCHCTL_ID"
+    echo ""
+    echo "Available Commands:"
+    echo "  Use 'cliproxyapi-manager' without arguments to see all commands"
     ;;
   logs)
     echo "Displaying CLIProxyAPI logs from system log..."
@@ -92,6 +158,10 @@ case "$1" in
       echo "Health check failed. Service may not be running."
     fi
     ;;
+  health-full)
+    echo "Performing comprehensive health check..."
+    $HOME/.config/cliproxyapi/health-check.sh
+    ;;
   config-validate)
     echo "Validating CLIProxyAPI configuration..."
     if command -v yq >/dev/null 2>&1; then
@@ -111,18 +181,32 @@ case "$1" in
       exit 1
     fi
     ;;
+  config-full-validate)
+    echo "Performing full configuration validation..."
+    $HOME/.config/cliproxyapi/validate-config.sh "$CONFIG_FILE"
+    ;;
   *)
-    echo "Usage: $0 {start|stop|restart|status|edit-config|logs|runtime-info|test|health|config-validate}"
-    echo "  start            - Start the CLIProxyAPI service"
-    echo "  stop             - Stop the CLIProxyAPI service"
-    echo "  restart          - Restart the CLIProxyAPI service"
-    echo "  status           - Check if CLIProxyAPI is running"
-    echo "  edit-config      - Edit the configuration file"
-    echo "  logs             - View service logs from system log"
-    echo "  runtime-info     - Show information about runtime directory"
-    echo "  test             - Test if the service is responding and list available models"
-    echo "  health           - Check the health status of the service"
-    echo "  config-validate  - Validate the configuration file syntax and show summary"
+    echo "Usage: $0 {start|stop|graceful-stop|restart|status|edit-config|templates|security-setup|backup|performance|integration|update|discover|logs|runtime-info|test|health|health-full|config-validate|config-full-validate}"
+    echo "  start              - Start the CLIProxyAPI service"
+    echo "  stop               - Stop the CLIProxyAPI service"
+    echo "  graceful-stop      - Gracefully stop the CLIProxyAPI service"
+    echo "  restart            - Restart the CLIProxyAPI service"
+    echo "  status             - Check if CLIProxyAPI is running"
+    echo "  edit-config        - Edit the configuration file"
+    echo "  templates          - Manage configuration templates"
+    echo "  security-setup     - Set up security permissions"
+    echo "  backup             - Manage backups and recovery"
+    echo "  performance        - Monitor performance metrics"
+    echo "  integration        - Manage service integrations"
+    echo "  update             - Manage updates and version info"
+    echo "  discover           - Discover configuration and capabilities"
+    echo "  logs               - View service logs from system log"
+    echo "  runtime-info       - Show information about runtime directory"
+    echo "  test               - Test if the service is responding and list available models"
+    echo "  health             - Check the health status of the service"
+    echo "  health-full        - Perform comprehensive health check"
+    echo "  config-validate    - Validate the configuration file syntax and show summary"
+    echo "  config-full-validate - Perform comprehensive configuration validation"
     exit 1
     ;;
 esac

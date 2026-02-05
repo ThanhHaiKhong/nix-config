@@ -4,7 +4,7 @@
   <dict>
     <key>Label</key>
     <string>local.cliproxyapi</string>
-    
+
     <key>ProgramArguments</key>
     <array>
       <string>cliproxyapi</string>
@@ -21,13 +21,42 @@
       <false/>
     </dict>
 
+    <!-- Health check to ensure the service is responsive -->
+    <key>WatchPaths</key>
+    <array>
+      <string>$HOME/.config/cliproxyapi/config.yaml</string>
+    </array>
+
     <key>EnvironmentVariables</key>
     <dict>
       <key>PATH</key>
-      <string>/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/thanhhaikhong/.nix-profile/bin</string>
+      <string>/run/current-system/sw/bin:/etc/profiles/per-user/$USER/bin:$PATH</string>
       <key>HOME</key>
       <string>/Users/thanhhaikhong</string>
     </dict>
-    
+
+    <!-- Resource limits -->
+    <key>SoftResourceLimits</key>
+    <dict>
+      <key>NumberOfFiles</key>
+      <integer>4096</integer>
+      <key>ResidentSetSize</key>
+      <integer>1073741824</integer> <!-- 1GB in bytes -->
+    </dict>
+
+    <key>HardResourceLimits</key>
+    <dict>
+      <key>NumberOfFiles</key>
+      <integer>8192</integer>
+    </dict>
+
+    <!-- Graceful shutdown handling -->
+    <key>ThrottleInterval</key>
+    <integer>30</integer>
+
+    <!-- Signal handling -->
+    <key>AbandonProcessGroup</key>
+    <false/>
+
   </dict>
 </plist>
