@@ -46,10 +46,8 @@ auth-dir: "~/.local/share/cli-proxy-api"
 # server.
 # The various keys below are what CLIProxyAPI needs as a client to access the
 # server.
-api-keys:
-  - "sk-cliproxyapi-1234567890abcdef"
-  - "sk-cliproxyapi-fedcba0987654321"
-  - "sk-cliproxyapi-1357924680abcdef"
+# NOTE: API keys are managed separately via SOPS secrets and injected at runtime
+api-keys: []
 # Logging and Debugging
 # Whether to enable Debug information in the log, it is disabled by default.
 # You only need to turn it on when the author needs to cooperate in

@@ -54,7 +54,8 @@ let
     # server.
     # The various keys below are what CLIProxyAPI needs as a client to access the
     # server.
-    api-keys: ${builtins.toJSON cfg.apiKeys}
+    # NOTE: API keys are managed separately via SOPS secrets and injected at runtime
+    api-keys: []
     # Logging and Debugging
     # Whether to enable Debug information in the log, it is disabled by default.
     # You only need to turn it on when the author needs to cooperate in
@@ -257,6 +258,7 @@ in
 
     # Activation script to update the config with decrypted API keys after secrets are available
     home.activation.updateCliproxyapiConfig = lib.hm.dag.entryAfter [ "installCliproxyapiPlist" ] ''
+      # Check if the SOPS decrypted secret file exists in the expected location
       if [ -f "$HOME/.local/share/cliproxyapi-api-keys/secret" ]; then
         echo "Updating CLIProxyAPI config with API keys from secrets..."
         $HOME/.config/cliproxyapi/update-config-with-keys.sh

@@ -204,6 +204,15 @@
     };
   };
 
+  # SOPS configuration for secrets
+  sops = {
+    defaultSopsFile = ../secrets/secrets.yaml;
+    age.keyFile = "/Users/${config.home.username}/.config/sops/age/keys.txt";
+    # Temporarily commented out until we can resolve the path issue
+    # secrets."cliproxyapi-api-keys".sopsFile = ../secrets/cliproxyapi-api-keys.yaml;
+    # secrets."cliproxyapi-api-keys".path = "/Users/${config.home.username}/.local/share/cliproxyapi-api-keys/secret";
+  };
+
   # CLIProxyAPI configuration
   home.file.".config/cliproxyapi/config.yaml".text = builtins.readFile ./configs/cliproxyapi/config.yaml;
 
