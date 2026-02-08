@@ -5,12 +5,17 @@
   home.enableNixpkgsReleaseCheck = false;
 
   home.sessionVariables.SHELL = "${pkgs.zsh}/bin/zsh";
-  
+
   # User's home directory path
   home.homeDirectory = "/Users/${config.home.username}";
-  
+
   # Enable Home Manager itself
   programs.home-manager.enable = true;
+
+  # Import the cliproxyapi module
+  imports = [
+    ./modules/cliproxyapi.nix
+  ];
 
   # Nix package indexer for fast searching
   programs.nix-index.enable = true;
@@ -93,11 +98,18 @@
   programs.zsh = {
     enable = true;
     enableCompletion = true;
-    shellAliases = {
-      ll = "ls -la";
-      switch = "home-manager switch --flake ~/.config/nix";
-      update = "sudo nixos-rebuild switch";
-    };
+    shellAliases = lib.mkMerge [
+      {
+        ll = "ls -la";
+        switch = "home-manager switch --flake ~/.config/nix";
+        update = "sudo nixos-rebuild switch";
+      }
+      (lib.mkIf config.programs.cliproxyapi.enable {
+        opencode = ''
+          cliproxyapi-ensure-ready && command opencode "$@"
+        '';
+      })
+    ];
     autosuggestion.enable = true;
     autosuggestion.highlight = "fg=#ff00ff,bg=cyan,bold,underline";
     oh-my-zsh.enable = true;
@@ -208,78 +220,46 @@
   sops = {
     defaultSopsFile = ../secrets/secrets.yaml;
     age.keyFile = "/Users/${config.home.username}/.config/sops/age/keys.txt";
-    # Temporarily commented out until we can resolve the path issue
-    # secrets."cliproxyapi-api-keys".sopsFile = ../secrets/cliproxyapi-api-keys.yaml;
-    # secrets."cliproxyapi-api-keys".path = "/Users/${config.home.username}/.local/share/cliproxyapi-api-keys/secret";
   };
 
-  # CLIProxyAPI configuration
-  home.file.".config/cliproxyapi/config.yaml".text = builtins.readFile ./configs/cliproxyapi/config.yaml;
+  # Make the encrypted file available in the home configuration
+  home.file.".config/cliproxyapi/encrypted-api-keys.yaml".source = ./secrets/cliproxyapi-api-keys.yaml;
 
-  # CLIProxyAPI management script
-  home.file.".local/bin/cliproxyapi-manager".source = ./configs/local/bin/cliproxyapi-manager.sh;
-  home.file.".local/bin/cliproxyapi-manager".executable = true;
+  # Custom activation script to handle cliproxyapi API keys decryption
+  home.activation.decryptCliproxyapiKeys = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    # Create the directory for cliproxyapi secrets
+    mkdir -p "$HOME/.local/share/cliproxyapi-api-keys"
+    
+    # Check if sops is available and the encrypted file exists
+    if command -v sops >/dev/null 2>&1 && [ -f "$HOME/.config/cliproxyapi/encrypted-api-keys.yaml" ]; then
+      echo "Attempting to decrypt cliproxyapi API keys..."
+      
+      # Set the age key file environment variable and decrypt the apiKeys list
+      SOPS_AGE_KEY_FILE="$HOME/.config/sops/age/keys.txt" \
+      sops -d "$HOME/.config/cliproxyapi/encrypted-api-keys.yaml" | \
+      yq '.apiKeys' > "$HOME/.local/share/cliproxyapi-api-keys/secret"
+      
+      if [ $? -eq 0 ]; then
+        echo "Successfully decrypted cliproxyapi API keys"
+      else
+        echo "Failed to decrypt cliproxyapi API keys"
+      fi
+    else
+      echo "Sops not available or encrypted file not found"
+    fi
+  '';
 
-  # CLIProxyAPI launchd plist
-  home.file.".config/cliproxyapi/launchd.plist".text = builtins.readFile ./configs/local/Library/LaunchAgents/local.cliproxyapi.plist;
-
-  # CLIProxyAPI readiness script
-  home.file.".local/bin/cliproxyapi-ensure-ready".source = ./configs/cliproxyapi/ensure-ready.sh;
-  home.file.".local/bin/cliproxyapi-ensure-ready".executable = true;
-
-  # Enhanced monitoring script
-  home.file.".config/cliproxyapi/enhanced-monitoring.sh".source = ./configs/cliproxyapi/enhanced-monitoring.sh;
-  home.file.".config/cliproxyapi/enhanced-monitoring.sh".executable = true;
-
-  # Enhanced opencode wrapper
-  home.file.".config/cliproxyapi/enhanced-opencode-wrapper.sh".source = ./configs/cliproxyapi/enhanced-opencode-wrapper.sh;
-  home.file.".config/cliproxyapi/enhanced-opencode-wrapper.sh".executable = true;
-
-  # Enhanced update manager
-  home.file.".config/cliproxyapi/update-manager.sh".source = ./configs/cliproxyapi/enhanced-update-manager.sh;
-  home.file.".config/cliproxyapi/update-manager.sh".executable = true;
-
-  # Enhanced backup manager
-  home.file.".config/cliproxyapi/enhanced-backup-manager.sh".source = ./configs/cliproxyapi/enhanced-backup-manager.sh;
-  home.file.".config/cliproxyapi/enhanced-backup-manager.sh".executable = true;
-
-  # Performance tuner
-  home.file.".config/cliproxyapi/performance-tuner.sh".source = ./configs/cliproxyapi/performance-tuner.sh;
-  home.file.".config/cliproxyapi/performance-tuner.sh".executable = true;
-
-  # Security hardener
-  home.file.".config/cliproxyapi/security-hardener.sh".source = ./configs/cliproxyapi/security-hardener.sh;
-  home.file.".config/cliproxyapi/security-hardener.sh".executable = true;
-
-  # Dashboard start script
-  home.file.".config/cliproxyapi/start-dashboard.sh".source = ./configs/cliproxyapi/start-dashboard.sh;
-  home.file.".config/cliproxyapi/start-dashboard.sh".executable = true;
-
-  # Dashboard server
-  home.file.".config/cliproxyapi/dashboard-server.py".source = ./configs/cliproxyapi/dashboard-server.py;
-
-  # Dashboard files
-  home.file.".config/cliproxyapi/dashboard/index.html".source = ./configs/cliproxyapi/dashboard/index.html;
-
-  # Deployment manager
-  home.file.".config/cliproxyapi/deployment-manager.sh".source = ./configs/cliproxyapi/deployment-manager.sh;
-  home.file.".config/cliproxyapi/deployment-manager.sh".executable = true;
-
-  # Update config with keys script
-  home.file.".config/cliproxyapi/update-config-with-keys.sh".source = ./configs/cliproxyapi/update-config-with-keys.sh;
-  home.file.".config/cliproxyapi/update-config-with-keys.sh".executable = true;
+  # CLIProxyAPI module
+  programs.cliproxyapi = {
+    enable = true;
+    enableManager = true;
+    enableMonitoring = true;
+  };
 
   home.packages = with pkgs; [
     yq
+    cliproxyapi  # Explicitly add cliproxyapi package
   ];
-
-  # Add a shell function to ensure CLIProxyAPI is running and logged in before opencode
-  programs.zsh.shellAliases = {
-    opencode = ''
-      $HOME/.config/cliproxyapi/enhanced-opencode-wrapper.sh "$@"
-    '';
-  };
-
 
    # Opencode
    programs.opencode = {

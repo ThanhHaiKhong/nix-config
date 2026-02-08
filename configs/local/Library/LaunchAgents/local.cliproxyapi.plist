@@ -9,7 +9,7 @@
     <array>
       <string>cliproxyapi</string>
       <string>--config</string>
-      <string>$HOME/.config/cliproxyapi/config.yaml</string>
+      <string>$HOME/.config/cliproxyapi/config-with-keys.yaml</string>
     </array>
 
     <key>RunAtLoad</key>
@@ -24,7 +24,7 @@
     <!-- Health check to ensure the service is responsive -->
     <key>WatchPaths</key>
     <array>
-      <string>$HOME/.config/cliproxyapi/config.yaml</string>
+      <string>$HOME/.config/cliproxyapi/config-with-keys.yaml</string>
     </array>
 
     <key>EnvironmentVariables</key>
@@ -32,7 +32,7 @@
       <key>PATH</key>
       <string>/run/current-system/sw/bin:/nix/var/nix/profiles/per-user/$USER/profile/bin:/nix/var/nix/profiles/default/bin:/run/wrappers/bin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
       <key>HOME</key>
-      <string>/Users/thanhhaikhong</string>
+      <string>$HOME</string>
     </dict>
 
     <!-- Resource limits -->

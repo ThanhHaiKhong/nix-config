@@ -193,32 +193,32 @@ in
     
     # Create the configuration file with reference to the secret
     # The actual API keys will be injected at runtime using a script
-    home.file.".config/cliproxyapi/config.yaml".source = ./../../configs/cliproxyapi/config.yaml;
+    home.file.".config/cliproxyapi/config.yaml".text = builtins.readFile ./../configs/cliproxyapi/config.yaml;
 
     # Create a script to update the config with decrypted API keys at runtime
-    home.file.".config/cliproxyapi/update-config-with-keys.sh".source = ./../../configs/cliproxyapi/update-config-with-keys.sh;
+    home.file.".config/cliproxyapi/update-config-with-keys.sh".source = ./../configs/cliproxyapi/update-config-with-keys.sh;
     home.file.".config/cliproxyapi/update-config-with-keys.sh".executable = true;
     
     # Install the management script if enabled
-    home.file.".local/bin/cliproxyapi-manager".source = ./../../configs/local/bin/cliproxyapi-manager.sh;
+    home.file.".local/bin/cliproxyapi-manager".source = ./../configs/local/bin/cliproxyapi-manager.sh;
     home.file.".local/bin/cliproxyapi-manager".executable = true;
-    
+
     # Install the launchd plist
-    home.file.".config/cliproxyapi/launchd.plist".source = ./../../configs/local/Library/LaunchAgents/local.cliproxyapi.plist;
-    
+    home.file.".config/cliproxyapi/launchd.plist".text = builtins.readFile ./../configs/local/Library/LaunchAgents/local.cliproxyapi.plist;
+
     # Install the enhanced monitoring script
-    home.file.".config/cliproxyapi/enhanced-monitoring.sh".source = ./../../configs/cliproxyapi/enhanced-monitoring.sh;
+    home.file.".config/cliproxyapi/enhanced-monitoring.sh".source = ./../configs/cliproxyapi/enhanced-monitoring.sh;
     home.file.".config/cliproxyapi/enhanced-monitoring.sh".executable = true;
-    
+
     # Install the enhanced opencode wrapper
-    home.file.".config/cliproxyapi/enhanced-opencode-wrapper.sh".source = ./../../configs/cliproxyapi/enhanced-opencode-wrapper.sh;
+    home.file.".config/cliproxyapi/enhanced-opencode-wrapper.sh".source = ./../configs/cliproxyapi/enhanced-opencode-wrapper.sh;
     home.file.".config/cliproxyapi/enhanced-opencode-wrapper.sh".executable = true;
-    
+
     # Install the monitoring launchd plist if monitoring is enabled
-    home.file.".config/cliproxyapi/monitoring.plist".source = ./../../configs/local/Library/LaunchAgents/local.cliproxyapi.monitoring.plist;
+    home.file.".config/cliproxyapi/monitoring.plist".text = builtins.readFile ./../configs/local/Library/LaunchAgents/local.cliproxyapi.monitoring.plist;
 
     # Install the readiness script
-    home.file.".local/bin/cliproxyapi-ensure-ready".source = ./../../configs/cliproxyapi/ensure-ready.sh;
+    home.file.".local/bin/cliproxyapi-ensure-ready".source = ./../configs/cliproxyapi/ensure-ready.sh;
     home.file.".local/bin/cliproxyapi-ensure-ready".executable = true;
 
     # Add a shell function to ensure CLIProxyAPI is running before opencode
