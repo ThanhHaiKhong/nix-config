@@ -92,6 +92,7 @@ in
       "gh"
       "xcode-build-server"
       "qwen-code"
+      "xcodegen"
     ];
     taps = [
       #"FelixKratz/formulae" #sketchybar

@@ -95,8 +95,8 @@ if ! [[ "$PROJECT_NAME" =~ ^[A-Z][A-Za-z0-9]*$ ]]; then
     exit 1
 fi
 
-# Safely expand tilde
-BASE_PATH="${BASE_PATH/#\~/$HOME}"
+# Safely expand tilde and convert to absolute path
+BASE_PATH="$(cd "$(dirname "$BASE_PATH")" && pwd)/$(basename "$BASE_PATH")"
 PROJECT_DIR="$BASE_PATH/$DIR_NAME"
 
 if [ -d "$PROJECT_DIR" ]; then

@@ -259,6 +259,7 @@
   home.packages = with pkgs; [
     yq
     cliproxyapi  # Explicitly add cliproxyapi package
+    # xcodegen  # Installed via Homebrew to avoid Swift build issues
   ];
 
    # Opencode
